@@ -1,0 +1,11 @@
+## v1
+- basic functionality:
+    - read in file from command line args
+    - select items and move to list B
+    - change catergory to 'apartment'
+    - export list B
+    - horizontal scrollbar
+    
+## v2
+- account for case when transaction name has comma in it
+- vertical scrollbars
