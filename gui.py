@@ -12,6 +12,7 @@ else:
 # start the widgets
 master = tk.Tk()
 master.geometry('1000x500')
+master.title('Spreadsheet GUI')
 
 def createListbox(side="left"):
     """Function to create a tkinter Listbox."""
