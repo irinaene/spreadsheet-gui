@@ -24,7 +24,7 @@ class Window(tk.Tk):
         
         # add buttons
         # button: move items from input list to output list
-        self.createButton(text="Move Right", command=self.moveDown, side="top")
+        self.createButton(text="Move Right", command=self.move_right, side="top")
         # button: change category to apartment
         self.createButton(text="Apartment", command=self.add_apt, side="top")
         # button: export output list to csv
@@ -59,8 +59,8 @@ class Window(tk.Tk):
         btn = tk.Button(self, text=text, command=command)
         btn.pack(side=side, expand=True)
 
-    def moveDown(self):
-        '''move items from list A to list B'''
+    def move_right(self):
+        """Move items from input list to output list."""
         selections = self.listbox_in.curselection()
         for i in selections:
             entry = self.listbox_in.get(i)
@@ -70,16 +70,16 @@ class Window(tk.Tk):
                         entry_items[4] + ";" + entry_items[3] + "; ;" + \
                         entry_items[3]
 
-            # add formated entry to list B
+            # add formated entry to output list
             self.listbox_out.insert(tk.END, new_entry)
 
-        # delete selected items from list A by sorting indeces in reverse order
+        # delete selected items from input list by sorting indeces in reverse order
         reversed_selections = selections[::-1]
         for item in reversed_selections:
             self.listbox_in.delete(item)
             
     def add_apt(self):
-        '''change category from food to apartment'''
+        """Change selected item category from food to apartment."""
         selections = self.listbox_out.curselection()
         for i in selections:
             entry = self.listbox_out.get(i)
@@ -95,7 +95,7 @@ class Window(tk.Tk):
             self.listbox_out.insert(i, new_entry)
             
     def export_all(self):
-        '''move all items from list B to csv'''
+        """Export items from output list to csv."""
         all_items = self.listbox_out.get(0, tk.END)
         
         f = open('out.csv', "w")
