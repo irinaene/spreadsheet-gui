@@ -83,15 +83,18 @@ def export_all():
         f.write(item + "\n")
     f.close()
 
-# button: move items to right list
-moveBtn = tk.Button(master, text="Move Right", command=moveDown)
-moveBtn.pack(side="top",expand=True)
-# button: change category to apartment
-aptBtn = tk.Button(master, text="Apartment", command=add_apt)
-aptBtn.pack(side="top", expand=True)
-# button: export all to csv
-expBtn = tk.Button(master, text="Export", command=export_all)
-expBtn.pack(side="bottom", expand=True)
+def createButton(text, command, side):
+    """Function to add button for a particular command."""
+    
+    btn = tk.Button(master, text=text, command=command)
+    btn.pack(side=side, expand=True)
+
+# add button: move items from input list to output list
+createButton(text="Move Right", command=moveDown, side="top")
+# add button: change category to apartment
+createButton(text="Apartment", command=add_apt, side="top")
+# add button: export output list to csv
+createButton(text="Export", command=export_all, side="bottom")
 
 def readInputData():
     """Function to read data from file provided as CLI argument.
