@@ -13,31 +13,29 @@ else:
 master = tk.Tk()
 master.geometry('1000x500')
 
-# define list A and scrollbars h/v
-listboxA = tk.Listbox(master, selectmode=tk.MULTIPLE)
-scrollbarA = tk.Scrollbar(listboxA, orient="horizontal")
-scrollbarAA = tk.Scrollbar(listboxA, orient="vertical")
-# config scroll and list so they know about each other
-scrollbarA.config(command=listboxA.xview)
-scrollbarAA.config(command=listboxA.yview)
-listboxA.config(xscrollcommand=scrollbarA.set, yscrollcommand=scrollbarAA.set)
-# place the elems
-scrollbarA.pack(side="bottom", fill="x")
-scrollbarAA.pack(side="right", fill="y")
-listboxA.pack(side="left",fill="both", expand=True)
+def createListbox(side="left"):
+    """Function to create a tkinter Listbox."""
+    
+    # define listbox with multiple selection and scrollbars h/v
+    listbox = tk.Listbox(master, selectmode=tk.MULTIPLE)
+    scrollbarH = tk.Scrollbar(listbox, orient="horizontal")
+    scrollbarV = tk.Scrollbar(listbox, orient="vertical")
+    
+    # configure scrollbars and listbox so they know about each other
+    scrollbarH.config(command=listbox.xview)
+    scrollbarV.config(command=listbox.yview)
+    listbox.config(xscrollcommand=scrollbarH.set, yscrollcommand=scrollbarV.set)
+    
+    # place the elements
+    scrollbarH.pack(side="bottom", fill="x")
+    scrollbarV.pack(side="right", fill="y")
+    listbox.pack(side=side, fill="both", expand=True)
+    
+    return listbox
 
-# define list B and scrollbars h/v
-listboxB = tk.Listbox(master, selectmode=tk.MULTIPLE)
-scrollbarB = tk.Scrollbar(listboxB, orient="horizontal",)
-scrollbarBB = tk.Scrollbar(listboxB, orient="vertical",)
-# config scroll and list so they know about each other
-scrollbarB.config(command=listboxB.xview)
-scrollbarBB.config(command=listboxB.yview)
-listboxB.config(xscrollcommand=scrollbarB.set, yscrollcommand=scrollbarBB.set)
-# place the elems
-scrollbarB.pack(side="bottom", fill="x")
-scrollbarBB.pack(side="right", fill="y")
-listboxB.pack(side="right",fill="both", expand=True)
+# create listbox
+listboxA = createListbox(side="left")
+listboxB = createListbox(side="right")
 
 def moveDown():
     '''move items from list A to list B'''
@@ -114,4 +112,3 @@ with open(input_file) as fin:
     
 # run the main tkinter loop  
 master.mainloop()
-
