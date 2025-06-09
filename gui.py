@@ -10,15 +10,15 @@ else:
     import Tkinter as tk
 
 # start the widgets
-master = tk.Tk()
-master.geometry('1000x500')
-master.title('Spreadsheet GUI')
+window = tk.Tk()
+window.geometry('1000x500')
+window.title('Spreadsheet GUI')
 
 def createListbox(side="left"):
     """Function to create a tkinter Listbox."""
     
     # define listbox with multiple selection and scrollbars h/v
-    listbox = tk.Listbox(master, selectmode=tk.MULTIPLE)
+    listbox = tk.Listbox(window, selectmode=tk.MULTIPLE)
     scrollbarH = tk.Scrollbar(listbox, orient="horizontal")
     scrollbarV = tk.Scrollbar(listbox, orient="vertical")
     
@@ -86,7 +86,7 @@ def export_all():
 def createButton(text, command, side):
     """Function to add button for a particular command."""
     
-    btn = tk.Button(master, text=text, command=command)
+    btn = tk.Button(window, text=text, command=command)
     btn.pack(side=side, expand=True)
 
 # add button: move items from input list to output list
@@ -117,4 +117,4 @@ def readInputData():
 readInputData()
     
 # run the main tkinter loop  
-master.mainloop()
+window.mainloop()
