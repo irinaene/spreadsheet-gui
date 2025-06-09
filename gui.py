@@ -92,23 +92,25 @@ aptBtn.pack(side="top", expand=True)
 expBtn = tk.Button(master, text="Export", command=export_all)
 expBtn.pack(side="bottom", expand=True)
 
-## read input data
-# read the data file into a list
-input_file = sys.argv[1]
-# import data using csv module
-with open(input_file) as fin:
-    csv_reader = csv.reader(fin, delimiter=',', quotechar='"')
-    for row in csv_reader:
-        # create one long string per row
-        concat_row = ''
-        for elem in row:
-            concat_row += elem + ";"
-        # add to list A
-        listboxA.insert(tk.END, concat_row)
+def readInputData():
+    """Function to read data from file provided as CLI argument.
+    Data is then used to populate the input listbox."""
+    
+    # get file name from CLI args
+    input_file = sys.argv[1]
+    # import data using csv module
+    with open(input_file) as fin:
+        csv_reader = csv.reader(fin, delimiter=',', quotechar='"')
+        for row in csv_reader:
+            # create one long string per row
+            concat_row = ''
+            for elem in row:
+                concat_row += elem + ";"
+            # add to list A
+            listboxA.insert(tk.END, concat_row)
 
-# populate list A
-#for item in chem_list[1:]:
-#    listboxA.insert(tk.END, item)
+# populate the input listbox
+readInputData()
     
 # run the main tkinter loop  
 master.mainloop()
