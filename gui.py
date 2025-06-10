@@ -22,13 +22,30 @@ class Window(tk.Tk):
         self.listbox_in = self.createListbox(side="left")
         self.listbox_out = self.createListbox(side="right")
         
+        # button frame
+        btn_frame = tk.Frame(self, padx=10, pady=10)
+        btn_frame.pack(side="left", fill="y")
+        btn_frame.rowconfigure(0, weight=3)
+        btn_frame.rowconfigure(1, weight=1)
+        btn_frame.rowconfigure(2, weight=1)
+        btn_frame.rowconfigure(3, weight=1)
+        btn_frame.rowconfigure(4, weight=1)
+        btn_frame.rowconfigure(5, weight=1)
+        btn_frame.rowconfigure(6, weight=1)
+        
         # add buttons
         # button: move items from input list to output list
-        self.createButton(text="Move Right", command=self.move_right, side="top")
+        self.createButton(btn_frame, 0, 0, text="Move Right", command=self.move_right)
+        # label: change category
+        self.cat_label = tk.Label(btn_frame, text="Change category to:").grid(row=1, column=0, sticky="s")
         # button: change category to apartment
-        self.createButton(text="Apartment", command=self.add_apt, side="top")
+        self.createButton(btn_frame, 2, 0, text="Apartment", command=self.add_apt)
+        # button: change category to food
+        self.createButton(btn_frame, 3, 0, text="Food", command=self.add_apt)
         # button: export output list to csv
-        self.createButton(text="Export", command=self.export_all, side="bottom")
+        self.createButton(btn_frame, 5, 0, text="Export to", command=self.export_all)
+        # label: name of output file
+        self.out_label = tk.Label(btn_frame, text='out.csv').grid(row=6, column=0, sticky="n")
         
         # populate the input listbox
         self.readInputData()
@@ -49,15 +66,15 @@ class Window(tk.Tk):
         # place the elements
         scrollbarH.pack(side="bottom", fill="x")
         scrollbarV.pack(side="right", fill="y")
-        listbox.pack(side=side, fill="both", expand=True)
+        listbox.pack(side=side, fill="both", expand=True, padx=10, pady=10)
         
         return listbox
     
-    def createButton(self, text, command, side):
+    def createButton(self, frame, row, col, text, command):
         """Function to add button for a particular command."""
         
-        btn = tk.Button(self, text=text, command=command)
-        btn.pack(side=side, expand=True)
+        btn = tk.Button(frame, text=text, command=command)
+        btn.grid(row=row, column=col)
 
     def move_right(self):
         """Move items from input list to output list."""
@@ -98,7 +115,8 @@ class Window(tk.Tk):
         """Export items from output list to csv."""
         all_items = self.listbox_out.get(0, tk.END)
         
-        f = open('out.csv', "w")
+        f_out = self.out_label["text"]
+        f = open(f_out, "w")
         for item in all_items:
             f.write(item + "\n")
         f.close()
