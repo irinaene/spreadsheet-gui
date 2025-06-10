@@ -39,9 +39,9 @@ class Window(tk.Tk):
         # label: change category
         self.cat_label = tk.Label(btn_frame, text="Change category to:").grid(row=1, column=0, sticky="s")
         # button: change category to apartment
-        self.createButton(btn_frame, 2, 0, text="Apartment", command=self.add_apt)
+        self.createButton(btn_frame, 2, 0, text="Apartment", command=lambda: self.change_category("apartment"))
         # button: change category to food
-        self.createButton(btn_frame, 3, 0, text="Food", command=self.add_apt)
+        self.createButton(btn_frame, 3, 0, text="Food", command=lambda: self.change_category("food"))
         # button: export output list to csv
         self.createButton(btn_frame, 5, 0, text="Export to", command=self.export_all)
         # label: name of output file
@@ -95,15 +95,15 @@ class Window(tk.Tk):
         for item in reversed_selections:
             self.listbox_in.delete(item)
             
-    def add_apt(self):
-        """Change selected item category from food to apartment."""
+    def change_category(self, category):
+        """Change selected item category to provided category."""
         selections = self.listbox_out.curselection()
         for i in selections:
             entry = self.listbox_out.get(i)
             
             entry_items = entry.split(";")
             new_entry = entry_items[0] + ";" + entry_items[1] + ";" + \
-                        "apartment" + ";" + \
+                        str(category) + ";" + \
                         entry_items[3] + ";" + entry_items[4] + "; ;" + \
                         entry_items[6]
             
