@@ -26,12 +26,8 @@ class Window(tk.Tk):
         btn_frame = tk.Frame(self, padx=10, pady=10)
         btn_frame.pack(side="left", fill="y")
         btn_frame.rowconfigure(0, weight=3)
-        btn_frame.rowconfigure(1, weight=1)
-        btn_frame.rowconfigure(2, weight=1)
-        btn_frame.rowconfigure(3, weight=1)
-        btn_frame.rowconfigure(4, weight=1)
-        btn_frame.rowconfigure(5, weight=1)
-        btn_frame.rowconfigure(6, weight=1)
+        for idx in range(1, 7):
+            btn_frame.rowconfigure(idx, weight=1)
         
         # add buttons
         # button: move items from input list to output list
