@@ -27,23 +27,24 @@ class Window(tk.Tk):
         # button frame
         btn_frame = tk.Frame(self, padx=10, pady=10)
         btn_frame.pack(side="left", fill="y")
-        btn_frame.rowconfigure(0, weight=3)
-        for idx in range(1, 7):
+        for idx in range(0, 9):
             btn_frame.rowconfigure(idx, weight=1)
         
         # add buttons
         # button: move items from input list to output list
         self.createButton(btn_frame, 0, 0, text="Move Right", command=self.move_right)
+        # button: clear selection from input list
+        self.createButton(btn_frame, 2, 0, text="Clear selection", command=self.clear_selection)
         # label: change category
-        self.cat_label = tk.Label(btn_frame, text="Change category to:").grid(row=1, column=0, sticky="s")
+        self.cat_label = tk.Label(btn_frame, text="Change category to:").grid(row=3, column=0, sticky="s")
         # button: change category to apartment
-        self.createButton(btn_frame, 2, 0, text="Apartment", command=lambda: self.change_category("apartment"))
+        self.createButton(btn_frame, 4, 0, text="Apartment", command=lambda: self.change_category("apartment"))
         # button: change category to food
-        self.createButton(btn_frame, 3, 0, text="Food", command=lambda: self.change_category("food"))
+        self.createButton(btn_frame, 5, 0, text="Food", command=lambda: self.change_category("food"))
         # button: export output list to csv
-        self.createButton(btn_frame, 5, 0, text="Export to", command=self.export_all)
+        self.createButton(btn_frame, 7, 0, text="Export to", command=self.export_all)
         # label: name of output file
-        self.out_label = tk.Label(btn_frame, text='out.csv').grid(row=6, column=0, sticky="n")
+        self.out_label = tk.Label(btn_frame, text='out.csv').grid(row=8, column=0, sticky="n")
 
     def createListbox(self, side="left"):
         """Function to create a tkinter Listbox."""
@@ -89,6 +90,11 @@ class Window(tk.Tk):
         reversed_selections = selections[::-1]
         for item in reversed_selections:
             self.listbox_in.delete(item)
+    
+    def clear_selection(self):
+        """Clears the current selection of the input listbox."""
+        
+        self.listbox_in.selection_clear(0, tk.END)
             
     def change_category(self, category):
         """Change selected item category to provided category."""
