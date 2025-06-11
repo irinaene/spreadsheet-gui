@@ -50,7 +50,7 @@ class Window(tk.Tk):
         """Function to create a tkinter Listbox."""
         
         # define listbox with multiple selection and scrollbars h/v
-        listbox = tk.Listbox(self, selectmode=tk.MULTIPLE, font="TkFixedFont")
+        listbox = tk.Listbox(self, selectmode=tk.EXTENDED, font="TkFixedFont")
         scrollbarH = tk.Scrollbar(listbox, orient="horizontal")
         scrollbarV = tk.Scrollbar(listbox, orient="vertical")
         
