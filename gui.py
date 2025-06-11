@@ -32,7 +32,9 @@ class Window(tk.Tk):
         
         # add buttons
         # button: move items from input list to output list
-        self.createButton(btn_frame, 0, 0, text="Move Right", command=self.move_right)
+        self.createButton(btn_frame, 0, 0, text="Move Right", command=self.move_items)
+        # button: move items from output list back to input list
+        self.createButton(btn_frame, 1, 0, text="Move Left", command=lambda: self.move_items(left="out"))
         # button: clear selection from input list
         self.createButton(btn_frame, 2, 0, text="Clear selection", command=self.clear_selection)
         # label: change category
@@ -72,22 +74,26 @@ class Window(tk.Tk):
         btn = tk.Button(frame, text=text, command=command)
         btn.grid(row=row, column=col)
 
-    def move_right(self):
-        """Move items from input list to output list."""
+    def move_items(self, left="in"):
+        """Move items from left listbox to right listbox."""
         
-        self.listbox_out.delete(tk.END)
-        selections = self.listbox_in.curselection()
+        # define the two lists
+        left_lst = self.listbox_in if left == "in" else self.listbox_out
+        right_lst = self.listbox_out if left == "in" else self.listbox_in
+        
+        right_lst.delete(tk.END)
+        selections = left_lst.curselection()
         for i in selections:
-            entry = self.listbox_in.get(i)
+            entry = left_lst.get(i)
             # add formated entry to output list
-            self.listbox_out.insert(tk.END, entry)
+            right_lst.insert(tk.END, entry)
         # fix last line not showing properly b/c of scrollbar
-        self.listbox_out.insert(tk.END, "")
+        right_lst.insert(tk.END, "")
 
         # delete selected items from input list by sorting indeces in reverse order
         reversed_selections = selections[::-1]
         for item in reversed_selections:
-            self.listbox_in.delete(item)
+            left_lst.delete(item)
     
     def clear_selection(self):
         """Clears the current selection of the input listbox."""
