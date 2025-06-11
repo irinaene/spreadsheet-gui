@@ -20,6 +20,10 @@ class Window(tk.Tk):
         self.geometry('1000x500')
         self.title('Spreadsheet GUI')
         
+        # set max lengths for output formatting of the fields
+        self.desc_len = 50  # max len for description field
+        self.cat_len = 20  # max len for category field
+        
         # create input and output lists
         self.listbox_in = self.createListbox(side="left")
         self.listbox_out = self.createListbox(side="right")
@@ -139,13 +143,13 @@ def readInputData(window):
     files.extend(glob.glob(f"{input_dir}/*.CSV"))
     # add header with column descriptions, nicely formatted
     c1 = "Date".ljust(10)
-    c2 = "Description".ljust(50)
-    c3 = "Category".ljust(20)
+    c2 = "Description".ljust(window.desc_len)
+    c3 = "Category".ljust(window.cat_len)
     header_line = f"{c1} | {c2} | {c3} | Amount"
     window.listbox_in.insert(tk.END, header_line)
     # define separator line between different files
-    desc_len, cat_len = 50, 20  # max lengths for various entries
-    sep_line = "-" * 10 + "-|-" + "-" * desc_len + "-|-" + "-" * cat_len + "-|-" + "-" * 11
+    # desc_len, cat_len = 50, 20  # max lengths for various entries
+    sep_line = "-" * 10 + "-|-" + "-" * window.desc_len + "-|-" + "-" * window.cat_len + "-|-" + "-" * 11
     window.listbox_in.insert(tk.END, sep_line)
     for input_file in files:
         print(input_file)
@@ -159,7 +163,7 @@ def readInputData(window):
                 if ("autopay" in row_str) or ("automatic payment" in row_str) or (len(row) == 0):
                     continue
                 # format row depending on csv header info
-                new_row = formatRow(row, header=header, desc_len=desc_len, cat_len=cat_len)
+                new_row = formatRow(row, header=header, desc_len=window.desc_len, cat_len=window.cat_len)
                 # create one long string per row
                 concat_row = " | ".join(new_row)
                 # add to input listbox
