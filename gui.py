@@ -81,6 +81,7 @@ class Window(tk.Tk):
             entry = self.listbox_in.get(i)
             # add formated entry to output list
             self.listbox_out.insert(tk.END, entry)
+        # fix last line not showing properly b/c of scrollbar
         self.listbox_out.insert(tk.END, "")
 
         # delete selected items from input list by sorting indeces in reverse order
@@ -159,7 +160,7 @@ def readInputData(window):
                 window.listbox_in.insert(tk.END, concat_row)
         # add a line to separate between the different data sources
         window.listbox_in.insert(tk.END, sep_line)
-    # fix last line not showing properly
+    # fix last line not showing properly b/c of scrollbar
     window.listbox_in.insert(tk.END, "")
 
 def formatRow(row, header, desc_len, cat_len):
