@@ -74,17 +74,14 @@ class Window(tk.Tk):
 
     def move_right(self):
         """Move items from input list to output list."""
+        
+        self.listbox_out.delete(tk.END)
         selections = self.listbox_in.curselection()
         for i in selections:
             entry = self.listbox_in.get(i)
-            
-            entry_items = entry.split(";")
-            new_entry = '"' + entry_items[1] + '"' + ";" + entry_items[0] + ";food;" + \
-                        entry_items[4] + ";" + entry_items[3] + "; ;" + \
-                        entry_items[3]
-
             # add formated entry to output list
-            self.listbox_out.insert(tk.END, new_entry)
+            self.listbox_out.insert(tk.END, entry)
+        self.listbox_out.insert(tk.END, "")
 
         # delete selected items from input list by sorting indeces in reverse order
         reversed_selections = selections[::-1]
