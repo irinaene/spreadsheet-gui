@@ -44,9 +44,9 @@ class Window(tk.Tk):
         # label: change category
         self.cat_label = tk.Label(btn_frame, text="Change category to:").grid(row=3, column=0, sticky="s")
         # button: change category to apartment
-        self.createButton(btn_frame, 4, 0, text="Apartment", command=lambda: self.change_category("apartment"))
+        self.createButton(btn_frame, 4, 0, text="Apartment", command=lambda: self.change_category("Apartment"))
         # button: change category to food
-        self.createButton(btn_frame, 5, 0, text="Food", command=lambda: self.change_category("food"))
+        self.createButton(btn_frame, 5, 0, text="Food", command=lambda: self.change_category("Food"))
         # button: export output list to csv
         self.createButton(btn_frame, 7, 0, text="Export to", command=self.export_all)
         # label: name of output file
@@ -106,15 +106,15 @@ class Window(tk.Tk):
             
     def change_category(self, category):
         """Change selected item category to provided category."""
+        
         selections = self.listbox_out.curselection()
         for i in selections:
             entry = self.listbox_out.get(i)
             
-            entry_items = entry.split(";")
-            new_entry = entry_items[0] + ";" + entry_items[1] + ";" + \
-                        str(category) + ";" + \
-                        entry_items[3] + ";" + entry_items[4] + "; ;" + \
-                        entry_items[6]
+            entry_items = entry.split(" | ")
+            # change the category field
+            entry_items[2] = category.ljust(self.cat_len)
+            new_entry = " | ".join(entry_items)
             
             # replace entry with formatted entry
             self.listbox_out.delete(i)
