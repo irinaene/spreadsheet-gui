@@ -47,6 +47,8 @@ class Window(tk.Tk):
         self.createButton(btn_frame, 4, 0, text="Apartment", command=lambda: self.change_category("Apartment"))
         # button: change category to food
         self.createButton(btn_frame, 5, 0, text="Food", command=lambda: self.change_category("Food"))
+        # button: change category to rent
+        self.createButton(btn_frame, 6, 0, text="Rent", command=lambda: self.change_category("Rent"))
         # button: export output list to csv
         self.createButton(btn_frame, 7, 0, text="Export to", command=self.export_all)
         # label: name of output file
