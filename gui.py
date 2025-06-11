@@ -2,6 +2,8 @@
 
 import sys
 import csv
+import glob
+from datetime import datetime
 
 # import tkinter depends on py version
 if sys.version_info.major > 2:
@@ -42,15 +44,12 @@ class Window(tk.Tk):
         self.createButton(btn_frame, 5, 0, text="Export to", command=self.export_all)
         # label: name of output file
         self.out_label = tk.Label(btn_frame, text='out.csv').grid(row=6, column=0, sticky="n")
-        
-        # populate the input listbox
-        self.readInputData()
 
     def createListbox(self, side="left"):
         """Function to create a tkinter Listbox."""
         
         # define listbox with multiple selection and scrollbars h/v
-        listbox = tk.Listbox(self, selectmode=tk.MULTIPLE)
+        listbox = tk.Listbox(self, selectmode=tk.MULTIPLE, font="TkFixedFont")
         scrollbarH = tk.Scrollbar(listbox, orient="horizontal")
         scrollbarV = tk.Scrollbar(listbox, orient="vertical")
         
@@ -116,25 +115,67 @@ class Window(tk.Tk):
         for item in all_items:
             f.write(item + "\n")
         f.close()
+
+### functions to handle the different formats for the input data
+
+def readInputData(window):
+    """Function to read data from file provided as CLI argument.
+    Data is then used to populate the input listbox."""
     
-    def readInputData(self):
-        """Function to read data from file provided as CLI argument.
-        Data is then used to populate the input listbox."""
-        
-        # get file name from CLI args
-        input_file = sys.argv[1]
+    # get dir name from CLI args
+    input_dir = sys.argv[1]
+    files = glob.glob(f"{input_dir}/*.csv")
+    files.extend(glob.glob(f"{input_dir}/*.CSV"))
+    # add header with column descriptions
+    window.listbox_in.insert(tk.END, "Date - Description - Category - Amount")
+    for input_file in files[:3]:
+        print(input_file)
         # import data using csv module
         with open(input_file) as fin:
             csv_reader = csv.reader(fin, delimiter=',', quotechar='"')
+            header = " - ".join(next(csv_reader))
             for row in csv_reader:
+                # skip the autopay lines and empty line
+                if ("autopay" in " ".join(row).lower()) or (len(row) == 0):
+                    continue
+                # format row depending on csv header info
+                new_row = formatRow(row, header=header)
                 # create one long string per row
-                concat_row = ''
-                for elem in row:
-                    concat_row += elem + ";"
+                concat_row = " - ".join(new_row)
                 # add to list A
-                self.listbox_in.insert(tk.END, concat_row)
+                window.listbox_in.insert(tk.END, concat_row)
+        # add a line to separate between the different data sources
+        window.listbox_in.insert(tk.END, "-" * 100)
+    # fix last line not showing properly
+    window.listbox_in.insert(tk.END, "")
+
+def formatRow(row, header):
+    """Function to format a row given the header of the input csv file."""
+    
+    # max lengths for various entries
+    desc_len, cat_len = 42, 14
+    # use header to decide what info is contained in row
+    if header == "Date - Description - Amount":
+        # change the date to yyyy-mm-dd format
+        date = datetime.strptime(row[0], "%m/%d/%Y").strftime("%Y-%m-%d")
+        row[0] = date
+        # add a default category
+        row.insert(2, "food")
+    elif header == "Transaction Date - Posted Date - Card No. - Description - Category - Debit - Credit":
+        # print(new_row)
+        idx = [0, 3, 4, 5]
+        row = [row[id] for id in idx]
+    # set max length for description
+    if len(row[1]) < desc_len:
+        row[1] = row[1].ljust(desc_len)
+    # set max length for category
+    if len(row[2]) < cat_len:
+        row[2] = row[2].ljust(cat_len)
+    
+    return row
 
 
 # run the main tkinter loop
 window = Window()
+readInputData(window)
 window.mainloop()
