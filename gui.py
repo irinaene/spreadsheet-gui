@@ -35,7 +35,7 @@ class Window(tk.Tk):
         # button frame
         btn_frame = tk.Frame(self, padx=10, pady=10)
         btn_frame.pack(side="left", fill="y")
-        for idx in range(0, 9):
+        for idx in range(0, 10):
             btn_frame.rowconfigure(idx, weight=1)
         
         # add buttons
@@ -53,11 +53,13 @@ class Window(tk.Tk):
         self.createButton(btn_frame, 5, 0, text="Food", command=lambda: self.change_category("Food"))
         # button: change category to rent
         self.createButton(btn_frame, 6, 0, text="Rent", command=lambda: self.change_category("Rent"))
+        # button: change category to monthly gift
+        self.createButton(btn_frame, 7, 0, text="Monthly Gift", command=lambda: self.change_category("Monthly Gift"))
         # button: export output list to csv
-        self.createButton(btn_frame, 7, 0, text="Export to", command=self.export_all)
+        self.createButton(btn_frame, 8, 0, text="Export to", command=self.export_all)
         # label: name of output file
         self.out_label = tk.Label(btn_frame, text='out.csv')
-        self.out_label.grid(row=8, column=0, sticky="n")
+        self.out_label.grid(row=9, column=0, sticky="n")
 
     def createListbox(self, side="left", listvar=None):
         """Function to create a tkinter Listbox."""
@@ -175,6 +177,9 @@ class Window(tk.Tk):
                 # fix sign for amount fields
                 for i in [4, 6]:
                     new_fields[i] = f"{-1 * float(new_fields[i]):.2f}"
+                # special case: monthly gift
+                if new_fields[2] == "Monthly Gift":
+                    new_fields[6] = ""
                 new_entry = ",".join(new_fields)
                 f.write(new_entry + "\n")
         print(f"Exported data to file: {f_out}")
