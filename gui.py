@@ -119,7 +119,7 @@ class Window(tk.Tk):
             right_lst.append(left_lst[i])
         # sort the rows by date only for list_out
         if left == "in":
-            right_lst.sort(key=lambda x: x[:10], reverse=True)
+            right_lst.sort(key=lambda x: x[:10], reverse=False)
         # fix last line not showing properly b/c of scrollbar
         right_lst.append("")
         # update the StringVar
