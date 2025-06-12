@@ -25,8 +25,12 @@ class Window(tk.Tk):
         self.cat_len = 20  # max len for category field
         
         # create input and output lists
-        self.listbox_in = self.createListbox(side="left")
-        self.listbox_out = self.createListbox(side="right")
+        self.list_in = []
+        self.listvar_in = tk.StringVar(value=self.list_in)
+        self.listbox_in = self.createListbox(side="left", listvar=self.listvar_in)
+        self.list_out = []
+        self.listvar_out = tk.StringVar(value=self.list_out)
+        self.listbox_out = self.createListbox(side="right", listvar=self.listvar_out)
         
         # button frame
         btn_frame = tk.Frame(self, padx=10, pady=10)
@@ -54,11 +58,11 @@ class Window(tk.Tk):
         # label: name of output file
         self.out_label = tk.Label(btn_frame, text='out.csv').grid(row=8, column=0, sticky="n")
 
-    def createListbox(self, side="left"):
+    def createListbox(self, side="left", listvar=None):
         """Function to create a tkinter Listbox."""
         
         # define listbox with multiple selection and scrollbars h/v
-        listbox = tk.Listbox(self, selectmode=tk.EXTENDED, font="TkFixedFont")
+        listbox = tk.Listbox(self, selectmode=tk.EXTENDED, font="TkFixedFont", listvariable=listvar)
         scrollbarH = tk.Scrollbar(listbox, orient="horizontal")
         scrollbarV = tk.Scrollbar(listbox, orient="vertical")
         
@@ -83,23 +87,48 @@ class Window(tk.Tk):
     def move_items(self, left="in"):
         """Move items from left listbox to right listbox."""
         
-        # define the two lists
-        left_lst = self.listbox_in if left == "in" else self.listbox_out
-        right_lst = self.listbox_out if left == "in" else self.listbox_in
+        # define the two directions, left and right
+        if left == "in":
+            # moves right, from in to out
+            left_lb = self.listbox_in
+            left_lst = self.list_in
+            left_lvar = self.listvar_in
+            right_lst = self.list_out
+            right_lvar = self.listvar_out
+        else:
+            # moves left, from out to in
+            left_lb = self.listbox_out
+            left_lst = self.list_out
+            left_lvar = self.listvar_out
+            right_lst = self.list_in
+            right_lvar = self.listvar_in
         
-        right_lst.delete(tk.END)
-        selections = left_lst.curselection()
-        for i in selections:
-            entry = left_lst.get(i)
-            # add formated entry to output list
-            right_lst.insert(tk.END, entry)
+        if len(right_lst) > 0:
+            right_lst.pop()
+        # subselect rows that can be moved (e.g. not header, not separator line)
+        allowed_sel = []
+        for i in left_lb.curselection():
+            if (i == 0) or (left_lst[i][:10] == "-" * 10):
+                continue
+            allowed_sel.append(i)
+        # move allowed items
+        for i in allowed_sel:
+            right_lst.append(left_lst[i])
+        # sort the rows by date only for list_out
+        if left == "in":
+            right_lst.sort(key=lambda x: x[:10], reverse=True)
         # fix last line not showing properly b/c of scrollbar
-        right_lst.insert(tk.END, "")
-
-        # delete selected items from input list by sorting indeces in reverse order
-        reversed_selections = selections[::-1]
-        for item in reversed_selections:
-            left_lst.delete(item)
+        right_lst.append("")
+        # update the StringVar
+        right_lvar.set(right_lst)
+        
+        # delete selected items from input list by sorting indices in reverse order
+        for item in allowed_sel[::-1]:
+            left_lst.pop(item)
+        # update the StringVar
+        left_lvar.set(left_lst)
+        
+        print(self.listbox_out["listvariable"].get())
     
     def clear_selection(self):
         """Clears the current selection of the input listbox."""
@@ -107,20 +136,20 @@ class Window(tk.Tk):
         self.listbox_in.selection_clear(0, tk.END)
             
     def change_category(self, category):
-        """Change selected item category to provided category."""
+        """Change selected item category to provided category.
+        Applies only to items in the output list."""
         
         selections = self.listbox_out.curselection()
         for i in selections:
-            entry = self.listbox_out.get(i)
-            
+            entry = self.list_out[i]
             entry_items = entry.split(" | ")
             # change the category field
             entry_items[2] = category.ljust(self.cat_len)
             new_entry = " | ".join(entry_items)
-            
             # replace entry with formatted entry
-            self.listbox_out.delete(i)
-            self.listbox_out.insert(i, new_entry)
+            self.list_out[i] = new_entry
+        # update the StringVar
+        self.listvar_out.set(self.list_out)
             
     def export_all(self):
         """Export items from output list to csv."""
@@ -148,11 +177,10 @@ def readInputData(window):
     c2 = "Description".ljust(window.desc_len)
     c3 = "Category".ljust(window.cat_len)
     header_line = f"{c1} | {c2} | {c3} | Amount"
-    window.listbox_in.insert(tk.END, header_line)
+    window.list_in.append(header_line)
     # define separator line between different files
-    # desc_len, cat_len = 50, 20  # max lengths for various entries
     sep_line = "-" * 10 + "-|-" + "-" * window.desc_len + "-|-" + "-" * window.cat_len + "-|-" + "-" * 11
-    window.listbox_in.insert(tk.END, sep_line)
+    window.list_in.append(sep_line)
     for input_file in files:
         print(input_file)
         # import data using csv module
@@ -169,11 +197,13 @@ def readInputData(window):
                 # create one long string per row
                 concat_row = " | ".join(new_row)
                 # add to input listbox
-                window.listbox_in.insert(tk.END, concat_row)
+                window.list_in.append(concat_row)
         # add a line to separate between the different data sources
-        window.listbox_in.insert(tk.END, sep_line)
+        window.list_in.append(sep_line)
     # fix last line not showing properly b/c of scrollbar
-    window.listbox_in.insert(tk.END, "")
+    window.list_in.append("")
+    # update the StringVar
+    window.listvar_in.set(window.list_in)
 
 def formatRow(row, header, desc_len, cat_len):
     """Function to format a row given the header of the input csv file."""
