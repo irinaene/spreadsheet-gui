@@ -17,7 +17,7 @@ class Window(tk.Tk):
         super().__init__()
         
         # set window properties
-        self.geometry('1600x800')
+        self.geometry('1600x800+300+300')
         self.title('Spreadsheet GUI')
         
         # set max lengths for output formatting of the fields
