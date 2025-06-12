@@ -152,13 +152,32 @@ class Window(tk.Tk):
             
     def export_all(self):
         """Export items from output list to csv."""
-        all_items = self.listbox_out.get(0, tk.END)
         
         f_out = self.out_label["text"]
-        f = open(f_out, "w")
-        for item in all_items:
-            f.write(item + "\n")
-        f.close()
+        # map between order of fields in listbox and in output file
+        field_map = {0: 1, 1: 0, 2: 2, 4: 3, 6: 3}
+        
+        all_items = self.listbox_out.get(0, tk.END)[:-1]  # last item is empty line
+        with open(f_out, "w") as f:
+            for item in all_items:
+                fields = item.split(" | ")
+                fields = [field.strip() for field in fields]
+                # construct list with new fields to write in output file
+                new_fields = [""] * 7
+                for k in field_map:
+                    new_fields[k] = fields[field_map[k]]
+                ## postprocessing
+                # add default value for purchase method
+                new_fields[3] = "cc"
+                # change date format
+                date = datetime.strptime(new_fields[1], "%Y-%m-%d").strftime("%m/%d/%Y")
+                new_fields[1] = date
+                # fix sign for amount fields
+                for i in [4, 6]:
+                    new_fields[i] = f"{-1 * float(new_fields[i]):.2f}"
+                new_entry = ",".join(new_fields)
+                f.write(new_entry + "\n")
+        print(f"Exported data to file: {f_out}")
 
 ### functions to handle the different formats for the input data
 
