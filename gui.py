@@ -56,7 +56,8 @@ class Window(tk.Tk):
         # button: export output list to csv
         self.createButton(btn_frame, 7, 0, text="Export to", command=self.export_all)
         # label: name of output file
-        self.out_label = tk.Label(btn_frame, text='out.csv').grid(row=8, column=0, sticky="n")
+        self.out_label = tk.Label(btn_frame, text='out.csv')
+        self.out_label.grid(row=8, column=0, sticky="n")
 
     def createListbox(self, side="left", listvar=None):
         """Function to create a tkinter Listbox."""
@@ -128,8 +129,6 @@ class Window(tk.Tk):
         # update the StringVar
         left_lvar.set(left_lst)
         
-        print(self.listbox_out["listvariable"].get())
-    
     def clear_selection(self):
         """Clears the current selection of the input listbox."""
         
