@@ -111,7 +111,7 @@ class Window(tk.Tk):
         # subselect rows that can be moved (e.g. not header, not separator line)
         allowed_sel = []
         for i in left_lb.curselection():
-            if (i == 0) or (left_lst[i][:10] == "-" * 10):
+            if left_lst[i][:4] in ["Date", "----"]:
                 continue
             allowed_sel.append(i)
         # move allowed items
@@ -128,6 +128,9 @@ class Window(tk.Tk):
         # delete selected items from input list by sorting indices in reverse order
         for item in allowed_sel[::-1]:
             left_lst.pop(item)
+        # if list doesn't have data anymore, delete empty line for formatting
+        if len(left_lst) == 1 and left_lst[0] == "":
+            left_lst.pop()
         # update the StringVar
         left_lvar.set(left_lst)
         
