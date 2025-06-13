@@ -8,8 +8,10 @@ from datetime import datetime
 # import tkinter depends on py version
 if sys.version_info.major > 2:
     import tkinter as tk
+    from tkinter import ttk
 else:
     import Tkinter as tk
+    from TKinter import ttk
 
 
 class Window(tk.Tk):
@@ -24,48 +26,57 @@ class Window(tk.Tk):
         self.desc_len = 50  # max len for description field
         self.cat_len = 20  # max len for category field
         
+        # create frames to hold the widgets
+        self.in_frame = ttk.Frame(self)
+        self.btn_frame = ttk.Frame(self)
+        self.out_frame = ttk.Frame(self)
+        self.in_frame.place(relx=0.01, rely=0.01, relwidth=0.42, relheight=0.98)
+        self.btn_frame.place(relx=0.45, rely=0.125, relwidth=0.1, relheight=0.75)
+        self.out_frame.place(relx=0.57, rely=0.01, relwidth=0.42, relheight=0.98)
+        
         # create input and output lists
         self.list_in = []
         self.listvar_in = tk.StringVar(value=self.list_in)
-        self.listbox_in = self.createListbox(side="left", listvar=self.listvar_in)
+        self.listbox_in = self.createListbox(self.in_frame, listvar=self.listvar_in)
         self.list_out = []
         self.listvar_out = tk.StringVar(value=self.list_out)
-        self.listbox_out = self.createListbox(side="right", listvar=self.listvar_out)
-        
-        # button frame
-        btn_frame = tk.Frame(self, padx=10, pady=10)
-        btn_frame.pack(side="left", fill="y")
-        for idx in range(0, 10):
-            btn_frame.rowconfigure(idx, weight=1)
+        self.listbox_out = self.createListbox(self.out_frame, listvar=self.listvar_out)
         
         # add buttons
         # button: move items from input list to output list
-        self.createButton(btn_frame, 0, 0, text="Move Right", command=self.move_items)
+        self.createButton(self.btn_frame, relx=0.5, rely=0.05, text="Move Right", command=self.move_items)
         # button: move items from output list back to input list
-        self.createButton(btn_frame, 1, 0, text="Move Left", command=lambda: self.move_items(left="out"))
+        self.createButton(self.btn_frame, relx=0.5, rely=0.15, text="Move Left", command=lambda: self.move_items(left="out"))
         # button: clear selection from input list
-        self.createButton(btn_frame, 2, 0, text="Clear selection", command=self.clear_selection)
+        self.createButton(self.btn_frame, 0.5, 0.25, text="Clear selection", command=self.clear_selection)
+        # separator
+        sep1 = ttk.Separator(self.btn_frame, orient="horizontal")
+        sep1.place(relx=0, rely=0.3, relwidth=1.)
         # label: change category
-        self.cat_label = tk.Label(btn_frame, text="Change category to:").grid(row=3, column=0, sticky="s")
+        self.cat_label = tk.Label(self.btn_frame, text="Change category to:")
+        self.cat_label.place(relx=0.5, rely=0.35, anchor="center")
         # button: change category to apartment
-        self.createButton(btn_frame, 4, 0, text="Apartment", command=lambda: self.change_category("Apartment"))
+        self.createButton(self.btn_frame, 0.5, 0.45, text="Apartment", command=lambda: self.change_category("Apartment"))
         # button: change category to food
-        self.createButton(btn_frame, 5, 0, text="Food", command=lambda: self.change_category("Food"))
+        self.createButton(self.btn_frame, 0.5, 0.55, text="Food", command=lambda: self.change_category("Food"))
         # button: change category to rent
-        self.createButton(btn_frame, 6, 0, text="Rent", command=lambda: self.change_category("Rent"))
+        self.createButton(self.btn_frame, 0.5, 0.65, text="Rent", command=lambda: self.change_category("Rent"))
         # button: change category to monthly gift
-        self.createButton(btn_frame, 7, 0, text="Monthly Gift", command=lambda: self.change_category("Monthly Gift"))
-        # button: export output list to csv
-        self.createButton(btn_frame, 8, 0, text="Export to", command=self.export_all)
+        self.createButton(self.btn_frame, 0.5, 0.75, text="Monthly Gift", command=lambda: self.change_category("Monthly Gift"))
+        # separator
+        sep2 = ttk.Separator(self.btn_frame, orient="horizontal")
+        sep2.place(relx=0, rely=0.8, relwidth=1.)
         # label: name of output file
-        self.out_label = tk.Label(btn_frame, text='out.csv')
-        self.out_label.grid(row=9, column=0, sticky="n")
+        self.out_label = tk.Label(self.btn_frame, text='Export to: out.csv', wraplength=160)
+        self.out_label.place(relx=0.5, rely=0.85, anchor="center")
+        # button: export output list to csv
+        self.createButton(self.btn_frame, 0.5, 0.9, text="Export", command=self.export_all)
 
-    def createListbox(self, side="left", listvar=None):
+    def createListbox(self, frame, listvar=None):
         """Function to create a tkinter Listbox."""
         
         # define listbox with multiple selection and scrollbars h/v
-        listbox = tk.Listbox(self, selectmode=tk.EXTENDED, font="TkFixedFont", listvariable=listvar)
+        listbox = tk.Listbox(frame, selectmode=tk.EXTENDED, font="TkFixedFont", listvariable=listvar)
         scrollbarH = tk.Scrollbar(listbox, orient="horizontal")
         scrollbarV = tk.Scrollbar(listbox, orient="vertical")
         
@@ -77,15 +88,16 @@ class Window(tk.Tk):
         # place the elements
         scrollbarH.pack(side="bottom", fill="x")
         scrollbarV.pack(side="right", fill="y")
-        listbox.pack(side=side, fill="both", expand=True, padx=10, pady=10)
+        # place listbox to cover the whole frame
+        listbox.place(relx=0, rely=0, relwidth=1, relheight=1)
         
         return listbox
     
-    def createButton(self, frame, row, col, text, command):
+    def createButton(self, frame, relx, rely, text, command):
         """Function to add button for a particular command."""
         
         btn = tk.Button(frame, text=text, command=command)
-        btn.grid(row=row, column=col)
+        btn.place(relx=relx, rely=rely, anchor="center")
 
     def move_items(self, left="in"):
         """Move items from left listbox to right listbox."""
@@ -155,7 +167,7 @@ class Window(tk.Tk):
     def export_all(self):
         """Export items from output list to csv."""
         
-        f_out = self.out_label["text"]
+        f_out = self.out_label["text"].split(":")[1].strip()
         # map between order of fields in listbox and in output file
         field_map = {0: 1, 1: 0, 2: 2, 4: 3, 6: 3}
         
