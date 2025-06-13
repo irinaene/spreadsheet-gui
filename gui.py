@@ -47,8 +47,8 @@ class Window(tk.Tk):
         self.createButton(self.btn_frame, relx=0.5, rely=0.05, text="Move Right", command=self.move_items)
         # button: move items from output list back to input list
         self.createButton(self.btn_frame, relx=0.5, rely=0.15, text="Move Left", command=lambda: self.move_items(left="out"))
-        # button: clear selection from input list
-        self.createButton(self.btn_frame, 0.5, 0.25, text="Clear selection", command=self.clear_selection)
+        # # button: clear selection from input list
+        # self.createButton(self.btn_frame, 0.5, 0.25, text="Clear selection", command=self.clear_selection)
         # separator
         sep1 = ttk.Separator(self.btn_frame, orient="horizontal")
         sep1.place(relx=0, rely=0.3, relwidth=1.)
@@ -217,7 +217,6 @@ def readInputData(window):
     sep_line = "-" * 10 + "-|-" + "-" * window.desc_len + "-|-" + "-" * window.cat_len + "-|-" + "-" * 11
     window.list_in.append(sep_line)
     for input_file in files:
-        print(input_file)
         # import data using csv module
         with open(input_file) as fin:
             csv_reader = csv.reader(fin, delimiter=',', quotechar='"')
