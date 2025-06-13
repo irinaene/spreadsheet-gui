@@ -7,7 +7,11 @@ from utils import readInputData
 if __name__ == "__main__":
     # get dir name from CLI args
     input_dir = sys.argv[1]
-    # run the main tkinter loop
+    # create the GUI object
     window = Window()
-    readInputData(input_dir=input_dir, frame=window)
+    # read input data and format appropriately
+    data_lst = readInputData(input_dir=input_dir)
+    # add data to the GUI
+    window.importData(data_lst)
+    # run the main tkinter loop
     window.mainloop()

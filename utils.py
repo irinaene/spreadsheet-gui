@@ -5,22 +5,24 @@ import glob
 from datetime import datetime
 
 
-def readInputData(input_dir, frame):
+def readInputData(input_dir, desc_len=50, cat_len=20):
     """Function to read data from files living inside input_dir.
-    Data is then used to populate the input listbox of frame."""
+    Data is later used to populate the input listbox of GUI."""
     
-    # get all relevant files from input_dir
+    # list to hold all the data rows from relevant files
+    list_in = []
+    # get files from input_dir
     files = glob.glob(f"{input_dir}/*.csv")
     files.extend(glob.glob(f"{input_dir}/*.CSV"))
     # add header with column descriptions, nicely formatted
     c1 = "Date".ljust(10)
-    c2 = "Description".ljust(frame.desc_len)
-    c3 = "Category".ljust(frame.cat_len)
+    c2 = "Description".ljust(desc_len)
+    c3 = "Category".ljust(cat_len)
     header_line = f"{c1} | {c2} | {c3} | Amount"
-    frame.list_in.append(header_line)
+    list_in.append(header_line)
     # define separator line between different files
-    sep_line = "-" * 10 + "-|-" + "-" * frame.desc_len + "-|-" + "-" * frame.cat_len + "-|-" + "-" * 11
-    frame.list_in.append(sep_line)
+    sep_line = "-" * 10 + "-|-" + "-" * desc_len + "-|-" + "-" * cat_len + "-|-" + "-" * 11
+    list_in.append(sep_line)
     for input_file in files:
         # import data using csv module
         with open(input_file) as fin:
@@ -32,17 +34,18 @@ def readInputData(input_dir, frame):
                 if ("autopay" in row_str) or ("automatic payment" in row_str) or (len(row) == 0):
                     continue
                 # format row depending on csv header info
-                new_row = formatRow(row, header=header, desc_len=frame.desc_len, cat_len=frame.cat_len)
+                new_row = formatRow(row, header=header, desc_len=desc_len, cat_len=cat_len)
                 # create one long string per row
                 concat_row = " | ".join(new_row)
                 # add to input listbox
-                frame.list_in.append(concat_row)
+                list_in.append(concat_row)
         # add a line to separate between the different data sources
-        frame.list_in.append(sep_line)
+        list_in.append(sep_line)
     # fix last line not showing properly b/c of scrollbar
-    frame.list_in.append("")
-    # update the StringVar
-    frame.listvar_in.set(frame.list_in)
+    list_in.append("")
+    # # update the StringVar
+    # listvar_in.set(list_in)
+    return list_in
 
 def formatRow(row, header, desc_len, cat_len):
     """Function to format a row given the header of the input csv file."""

@@ -19,10 +19,6 @@ class Window(tk.Tk):
         self.geometry('1600x800+300+300')
         self.title('Spreadsheet GUI')
         
-        # set max lengths for output formatting of the fields
-        self.desc_len = 50  # max len for description field
-        self.cat_len = 20  # max len for category field
-        
         # create frames to hold the widgets
         self.in_frame = ttk.Frame(self)
         self.btn_frame = ttk.Frame(self)
@@ -192,3 +188,11 @@ class Window(tk.Tk):
                 new_entry = ",".join(new_fields)
                 f.write(new_entry + "\n")
         print(f"Exported data to file: {f_out}")
+    
+    def importData(self, list_in):
+        """Function to import data contained in list_in into the input listbox."""
+        
+        # update the relevant data list
+        self.list_in = list_in
+        # update the relevant StringVar
+        self.listvar_in.set(self.list_in)
