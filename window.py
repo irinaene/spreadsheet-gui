@@ -1,14 +1,15 @@
 """Define the GUI windows class using TKinter."""
 
 import sys
+import os
 from datetime import datetime
 # import tkinter depends on py version
 if sys.version_info.major > 2:
     import tkinter as tk
-    from tkinter import ttk
+    from tkinter import ttk, messagebox
 else:
     import Tkinter as tk
-    from TKinter import ttk
+    from TKinter import ttk, messagebox
 
 
 class Window(tk.Tk):
@@ -63,7 +64,7 @@ class Window(tk.Tk):
         self.out_label = tk.Label(self.btn_frame, text='Export to: out.csv', wraplength=160)
         self.out_label.place(relx=0.5, rely=0.85, anchor="center")
         # button: export output list to csv
-        self.createButton(self.btn_frame, 0.5, 0.9, text="Export", command=self.export_all)
+        self.createButton(self.btn_frame, 0.5, 0.9, text="Export", command=self.export_with_confirmation)
 
     def createListbox(self, frame, listvar=None):
         """Function to create a tkinter Listbox."""
@@ -157,10 +158,9 @@ class Window(tk.Tk):
         # update the StringVar
         self.listvar_out.set(self.list_out)
             
-    def export_all(self):
-        """Export items from output list to csv."""
+    def export_all(self, f_out):
+        """Export items from output list to csv file f_out."""
         
-        f_out = self.out_label["text"].split(":")[1].strip()
         # map between order of fields in listbox and in output file
         field_map = {0: 1, 1: 0, 2: 2, 4: 3, 6: 3}
         
@@ -187,7 +187,21 @@ class Window(tk.Tk):
                     new_fields[6] = ""
                 new_entry = ",".join(new_fields)
                 f.write(new_entry + "\n")
-        print(f"Exported data to file: {f_out}")
+        # print(f"Exported data to file: {f_out}")
+    
+    def export_with_confirmation(self):
+        """Export items to csv using a confirmation box for overwriting."""
+        
+        f_out = self.out_label["text"].split(":")[1].strip()
+        # check if file exists
+        if os.path.exists(f_out):
+            title = "Confirmation"
+            msg = f"The file {f_out} already exists. Do you want to overwrite it?"
+            # pop overwrite window
+            response = messagebox.askyesno(title, msg, parent=self)
+        # export if file doesn't exist or response is yes
+        if not os.path.exists(f_out) or response:
+            self.export_all(f_out)
     
     def importData(self, list_in):
         """Function to import data contained in list_in into the input listbox."""
