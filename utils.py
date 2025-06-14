@@ -9,19 +9,22 @@ def readInputData(input_dir, desc_len=50, cat_len=20):
     """Function to read data from files living inside input_dir.
     Data is later used to populate the input listbox of GUI."""
     
+    # set of currently fixed formatting parameters
+    date_len = 10
+    amt_len = 11
     # list to hold all the data rows from relevant files
     list_in = []
     # get files from input_dir
     files = glob.glob(f"{input_dir}/*.csv")
     files.extend(glob.glob(f"{input_dir}/*.CSV"))
     # add header with column descriptions, nicely formatted
-    c1 = "Date".ljust(10)
+    c1 = "Date".ljust(date_len)
     c2 = "Description".ljust(desc_len)
     c3 = "Category".ljust(cat_len)
     header_line = f"{c1} | {c2} | {c3} | Amount"
     list_in.append(header_line)
     # define separator line between different files
-    sep_line = "-" * 10 + "-|-" + "-" * desc_len + "-|-" + "-" * cat_len + "-|-" + "-" * 11
+    sep_line = "-" * date_len + "-|-" + "-" * desc_len + "-|-" + "-" * cat_len + "-|-" + "-" * amt_len
     list_in.append(sep_line)
     for input_file in files:
         # import data using csv module
@@ -43,9 +46,10 @@ def readInputData(input_dir, desc_len=50, cat_len=20):
         list_in.append(sep_line)
     # fix last line not showing properly b/c of scrollbar
     list_in.append("")
-    # # update the StringVar
-    # listvar_in.set(list_in)
-    return list_in
+    # dict containing the params for formatting the various fields
+    format_dict = {'desc_len': desc_len, 'cat_len': cat_len}
+    
+    return list_in, format_dict
 
 def formatRow(row, header, desc_len, cat_len):
     """Function to format a row given the header of the input csv file."""

@@ -20,6 +20,10 @@ class Window(tk.Tk):
         self.geometry('1600x800+300+300')
         self.title('Spreadsheet GUI')
         
+        # set some default max display lengths for list items
+        self.desc_len = 30
+        self.cat_len = 10
+        
         # create frames to hold the widgets
         self.in_frame = ttk.Frame(self)
         self.btn_frame = ttk.Frame(self)
@@ -203,10 +207,13 @@ class Window(tk.Tk):
         if not os.path.exists(f_out) or response:
             self.export_all(f_out)
     
-    def importData(self, list_in):
+    def importData(self, list_in, format_dict):
         """Function to import data contained in list_in into the input listbox."""
         
         # update the relevant data list
         self.list_in = list_in
         # update the relevant StringVar
         self.listvar_in.set(self.list_in)
+        # update the max lengths for display of fields
+        self.desc_len = format_dict['desc_len']
+        self.cat_len = format_dict['cat_len']
