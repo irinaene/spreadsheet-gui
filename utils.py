@@ -92,10 +92,7 @@ def formatRow(row, header, desc_len, cat_len):
         row[1] = row[1].ljust(desc_len)
     else:
         row[1] = row[1][:desc_len]
-    # set max length for category
-    if len(row[2]) < cat_len:
-        row[2] = row[2].ljust(cat_len)
-    else:
-        row[2] = row[2][:cat_len]
+    # set default category for all rows and max length for category
+    row[2] = "Food".ljust(cat_len)
     
     return row
