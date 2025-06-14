@@ -154,11 +154,13 @@ class Window(tk.Tk):
         for i in selections:
             entry = self.list_out[i]
             entry_items = entry.split(" | ")
-            # change the category field
-            entry_items[2] = category.ljust(self.cat_len)
-            new_entry = " | ".join(entry_items)
-            # replace entry with formatted entry
-            self.list_out[i] = new_entry
+            old_cat = entry_items[2].strip()
+            # change the category field only if new value is different from old value
+            if category != old_cat:
+                entry_items[2] = category.ljust(self.cat_len)
+                new_entry = " | ".join(entry_items)
+                # replace entry with formatted entry
+                self.list_out[i] = new_entry
         # update the StringVar
         self.listvar_out.set(self.list_out)
             
