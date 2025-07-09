@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import sys
-from window import Window
+
 from utils import readInputData
+from window import Window
 
 if __name__ == "__main__":
     # get dir name from CLI args

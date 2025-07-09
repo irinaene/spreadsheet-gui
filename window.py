@@ -1,15 +1,16 @@
 """Define the GUI windows class using TKinter."""
 
-import sys
 import os
+import sys
 from datetime import datetime
+
 # import tkinter depends on py version
 if sys.version_info.major > 2:
     import tkinter as tk
-    from tkinter import ttk, messagebox
+    from tkinter import messagebox, ttk
 else:
     import Tkinter as tk
-    from TKinter import ttk, messagebox
+    from TKinter import messagebox, ttk
 
 
 class Window(tk.Tk):
