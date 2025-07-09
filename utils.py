@@ -17,6 +17,8 @@ def readInputData(input_dir, desc_len=50, cat_len=20):
     # get files from input_dir
     files = glob.glob(f"{input_dir}/*.csv")
     files.extend(glob.glob(f"{input_dir}/*.CSV"))
+    # on windows, glob + wildcard returns duplicates, fix by using set to select unique values
+    files = list(set(files))
     # add header with column descriptions, nicely formatted
     c1 = "Date".ljust(date_len)
     c2 = "Description".ljust(desc_len)
