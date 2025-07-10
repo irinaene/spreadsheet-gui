@@ -142,6 +142,9 @@ class Window(tk.Tk):
         # update the StringVar
         left_lvar.set(left_lst)
         
+        # clear the current selection to start fresh for the next move
+        left_lb.select_clear(0, tk.END)
+        
     def clear_selection(self):
         """Clears the current selection of the input listbox."""
         
