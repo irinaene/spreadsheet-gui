@@ -43,9 +43,9 @@ class Window(tk.Tk):
         
         # add buttons
         # button: move items from input list to output list
-        self.createButton(self.btn_frame, relx=0.5, rely=0.05, text="Move Right", command=self.move_items)
+        self.createButton(self.btn_frame, relx=0.5, rely=0.05, text="Move Right", command=self.move_items_dir)
         # button: move items from output list back to input list
-        self.createButton(self.btn_frame, relx=0.5, rely=0.15, text="Move Left", command=lambda: self.move_items(left="out"))
+        self.createButton(self.btn_frame, relx=0.5, rely=0.15, text="Move Left", command=lambda: self.move_items_dir(direction="out_to_in"))
         # # button: clear selection from input list
         # self.createButton(self.btn_frame, 0.5, 0.25, text="Clear selection", command=self.clear_selection)
         # separator
@@ -98,49 +98,59 @@ class Window(tk.Tk):
         btn = tk.Button(frame, text=text, command=command)
         btn.place(relx=relx, rely=rely, anchor="center")
 
-    def move_items(self, left="in"):
-        """Move items from left listbox to right listbox."""
+    def move_items(self, selection, left_lst, right_lst, sort_right_lst=False):
+        """Move selected items (as given by selection) from left list to right list.
+        Optionally sorts the right list."""
         
-        # define the two directions, left and right
-        if left == "in":
-            # moves right, from in to out
-            left_lb = self.listbox_in
-            left_lst = self.list_in
-            left_lvar = self.listvar_in
-            right_lst = self.list_out
-            right_lvar = self.listvar_out
-        else:
-            # moves left, from out to in
-            left_lb = self.listbox_out
-            left_lst = self.list_out
-            left_lvar = self.listvar_out
-            right_lst = self.list_in
-            right_lvar = self.listvar_in
-        
+        # before adding any items, remove the empty line at the end
         if len(right_lst) > 0:
             right_lst.pop()
         # subselect rows that can be moved (e.g. not header, not separator line)
         allowed_sel = []
-        for i in left_lb.curselection():
+        for i in selection:
             if (left_lst[i] == "") or (left_lst[i][:4] in ["Date", "----"]):
                 continue
             allowed_sel.append(i)
         # move allowed items
         for i in allowed_sel:
             right_lst.append(left_lst[i])
-        # sort the rows by date only for list_out
-        if left == "in":
+        # sort the rows by date, only if moving from in to out
+        if sort_right_lst:
             right_lst.sort(key=lambda x: x[:10], reverse=False)
         # fix last line not showing properly b/c of scrollbar
         right_lst.append("")
-        # update the StringVar
-        right_lvar.set(right_lst)
-        
-        # delete selected items from input list by sorting indices in reverse order
+        # delete selected items from left list by sorting indices in reverse order
         for item in allowed_sel[::-1]:
             left_lst.pop(item)
-        # update the StringVar
+    
+    def move_items_dir(self, direction="in_to_out"):
+        """Moves items from input listbox to output listbox or vice versa."""
+        
+        # define the two allowed directions
+        if direction == "in_to_out":
+            left_lb = self.listbox_in
+            left_lst = self.list_in
+            left_lvar = self.listvar_in
+            right_lst = self.list_out
+            right_lvar = self.listvar_out
+            sort_right_lst = True
+        elif direction == "out_to_in":
+            left_lb = self.listbox_out
+            left_lst = self.list_out
+            left_lvar = self.listvar_out
+            right_lst = self.list_in
+            right_lvar = self.listvar_in
+            sort_right_lst = False
+        else:
+            print("Unsupported direction provided to move_items_dir, please double check!")
+            return
+        
+        # move the selected items
+        self.move_items(left_lb.curselection(), left_lst, right_lst, sort_right_lst=sort_right_lst)
+        
+        # post-processing: update the StringVars to propagate changes to ListBoxes
         left_lvar.set(left_lst)
+        right_lvar.set(right_lst)
         
         # clear the current selection to start fresh for the next move
         left_lb.select_clear(0, tk.END)
