@@ -18,7 +18,12 @@ class Window(tk.Tk):
         super().__init__()
         
         # set window properties
-        self.geometry('1700x800+300+300')
+        width, height = 1700, 800
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+        self.geometry(f"{width}x{height}+{x}+{y}")
         self.title('Spreadsheet GUI')
         
         # set some default max display lengths for list items
