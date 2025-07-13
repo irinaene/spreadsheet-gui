@@ -1,0 +1,12 @@
+[workspace]
+authors = ["Irina Ene <irina.ene@berkeley.edu>"]
+channels = ["conda-forge"]
+name = "spreadsheet-gui"
+platforms = ["osx-64", "win-64"]
+version = "0.1.0"
+
+[tasks]
+test = "python gui.py test_data"
+
+[dependencies]
+python = "3.10.*"
