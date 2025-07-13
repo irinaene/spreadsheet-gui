@@ -7,6 +7,7 @@ version = "0.1.0"
 
 [tasks]
 test = "python gui.py test_data"
+start = "python gui.py"
 
 [dependencies]
 python = "3.10.*"
