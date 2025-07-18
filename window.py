@@ -51,20 +51,29 @@ class Window(tk.Tk):
         self.listbox_out = self.createListbox(self.out_frame, listvar=self.listvar_out)
         
         # add buttons
-        # TODO add section to "change font"
-        # TODO add buttons to increase / decrease font size
+        font_label = tk.Label(self.btn_frame, text="Change font size:")
+        font_label.place(relx=0.5, rely=0.05, anchor="center")
+        # button: increase / decrease font size in listbox
+        dx = 0.15
+        self.createButton(self.btn_frame, relx=0.5 - dx, rely=0.1, text="-",
+                          command=lambda: self.change_font_size(kind="decrease"))
+        self.createButton(self.btn_frame, relx=0.5 + dx, rely=0.1, text="+",
+                          command=self.change_font_size)
+        # separator
+        sep0 = ttk.Separator(self.btn_frame, orient="horizontal")
+        sep0.place(relx=0, rely=0.15, relwidth=1.)
         # button: move items from input list to output list
-        self.createButton(self.btn_frame, relx=0.5, rely=0.05, text="Move Right", command=self.move_items_dir)
+        self.createButton(self.btn_frame, relx=0.5, rely=0.2, text="Move Right", command=self.move_items_dir)
         # button: move items from output list back to input list
-        self.createButton(self.btn_frame, relx=0.5, rely=0.15, text="Move Left", command=lambda: self.move_items_dir(direction="out_to_in"))
+        self.createButton(self.btn_frame, relx=0.5, rely=0.3, text="Move Left", command=lambda: self.move_items_dir(direction="out_to_in"))
         # # button: clear selection from input list
         # self.createButton(self.btn_frame, 0.5, 0.25, text="Clear selection", command=self.clear_selection)
         # separator
         sep1 = ttk.Separator(self.btn_frame, orient="horizontal")
-        sep1.place(relx=0, rely=0.3, relwidth=1.)
+        sep1.place(relx=0, rely=0.35, relwidth=1.)
         # label: change category
         self.cat_label = tk.Label(self.btn_frame, text="Change category to:")
-        self.cat_label.place(relx=0.5, rely=0.35, anchor="center")
+        self.cat_label.place(relx=0.5, rely=0.4, anchor="center")
         # button: change category to apartment
         self.createButton(self.btn_frame, 0.5, 0.45, text="Apartment", command=lambda: self.change_category("Apartment"))
         # button: change category to food
