@@ -109,7 +109,10 @@ class Window(tk.Tk):
         btn = tk.Button(frame, text=text, command=command)
         btn.place(relx=relx, rely=rely, anchor="center")
 
-    # TODO add function to change the font size used in listboxes
+    def change_font_size(self, kind="increase"):
+        incr = 1 if kind == "increase" else -1
+        self.font_size = self.font_size + incr
+        self.font.config(size=self.font_size)
 
     def move_items(self, selection, left_lst, right_lst, sort_right_lst=False):
         """Move selected items (as given by selection) from left list to right list.
