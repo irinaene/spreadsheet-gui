@@ -7,7 +7,7 @@ from datetime import datetime
 # import tkinter depends on py version
 if sys.version_info.major > 2:
     import tkinter as tk
-    from tkinter import messagebox, ttk
+    from tkinter import font, messagebox, ttk
 else:
     import Tkinter as tk
     from TKinter import messagebox, ttk
@@ -30,6 +30,10 @@ class Window(tk.Tk):
         self.desc_len = 30
         self.cat_len = 10
         
+        # default font (monospace)
+        self.font_size = 12
+        self.font = font.Font(family="Courier", size=self.font_size)
+        
         # create frames to hold the widgets
         self.in_frame = ttk.Frame(self)
         self.btn_frame = ttk.Frame(self)
@@ -47,18 +51,29 @@ class Window(tk.Tk):
         self.listbox_out = self.createListbox(self.out_frame, listvar=self.listvar_out)
         
         # add buttons
+        font_label = tk.Label(self.btn_frame, text="Change font size:")
+        font_label.place(relx=0.5, rely=0.05, anchor="center")
+        # button: increase / decrease font size in listbox
+        dx = 0.15
+        self.createButton(self.btn_frame, relx=0.5 - dx, rely=0.1, text="-",
+                          command=lambda: self.change_font_size(kind="decrease"))
+        self.createButton(self.btn_frame, relx=0.5 + dx, rely=0.1, text="+",
+                          command=self.change_font_size)
+        # separator
+        sep0 = ttk.Separator(self.btn_frame, orient="horizontal")
+        sep0.place(relx=0, rely=0.15, relwidth=1.)
         # button: move items from input list to output list
-        self.createButton(self.btn_frame, relx=0.5, rely=0.05, text="Move Right", command=self.move_items_dir)
+        self.createButton(self.btn_frame, relx=0.5, rely=0.2, text="Move Right", command=self.move_items_dir)
         # button: move items from output list back to input list
-        self.createButton(self.btn_frame, relx=0.5, rely=0.15, text="Move Left", command=lambda: self.move_items_dir(direction="out_to_in"))
+        self.createButton(self.btn_frame, relx=0.5, rely=0.3, text="Move Left", command=lambda: self.move_items_dir(direction="out_to_in"))
         # # button: clear selection from input list
         # self.createButton(self.btn_frame, 0.5, 0.25, text="Clear selection", command=self.clear_selection)
         # separator
         sep1 = ttk.Separator(self.btn_frame, orient="horizontal")
-        sep1.place(relx=0, rely=0.3, relwidth=1.)
+        sep1.place(relx=0, rely=0.35, relwidth=1.)
         # label: change category
         self.cat_label = tk.Label(self.btn_frame, text="Change category to:")
-        self.cat_label.place(relx=0.5, rely=0.35, anchor="center")
+        self.cat_label.place(relx=0.5, rely=0.4, anchor="center")
         # button: change category to apartment
         self.createButton(self.btn_frame, 0.5, 0.45, text="Apartment", command=lambda: self.change_category("Apartment"))
         # button: change category to food
@@ -80,7 +95,7 @@ class Window(tk.Tk):
         """Function to create a tkinter Listbox."""
         
         # define listbox with multiple selection and scrollbars h/v
-        listbox = tk.Listbox(frame, selectmode=tk.EXTENDED, font="TkFixedFont", listvariable=listvar)
+        listbox = tk.Listbox(frame, selectmode=tk.EXTENDED, font=self.font, listvariable=listvar)
         scrollbarH = tk.Scrollbar(listbox, orient="horizontal")
         scrollbarV = tk.Scrollbar(listbox, orient="vertical")
         
@@ -102,6 +117,14 @@ class Window(tk.Tk):
         
         btn = tk.Button(frame, text=text, command=command)
         btn.place(relx=relx, rely=rely, anchor="center")
+
+    def change_font_size(self, kind="increase"):
+        incr = 1 if kind == "increase" else -1
+        self.font_size = self.font_size + incr
+        # avoid negative or too large font size
+        if (self.font_size <= 0) or (self.font_size > 30):
+            self.font_size = 12
+        self.font.config(size=self.font_size)
 
     def move_items(self, selection, left_lst, right_lst, sort_right_lst=False):
         """Move selected items (as given by selection) from left list to right list.
