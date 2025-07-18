@@ -121,6 +121,9 @@ class Window(tk.Tk):
     def change_font_size(self, kind="increase"):
         incr = 1 if kind == "increase" else -1
         self.font_size = self.font_size + incr
+        # avoid negative or too large font size
+        if (self.font_size <= 0) or (self.font_size > 30):
+            self.font_size = 12
         self.font.config(size=self.font_size)
 
     def move_items(self, selection, left_lst, right_lst, sort_right_lst=False):
