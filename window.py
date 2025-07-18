@@ -30,6 +30,10 @@ class Window(tk.Tk):
         self.desc_len = 30
         self.cat_len = 10
         
+        # default font (monospace)
+        self.font_size = 12
+        self.font = font.Font(family="Courier", size=self.font_size)
+        
         # create frames to hold the widgets
         self.in_frame = ttk.Frame(self)
         self.btn_frame = ttk.Frame(self)
@@ -47,6 +51,8 @@ class Window(tk.Tk):
         self.listbox_out = self.createListbox(self.out_frame, listvar=self.listvar_out)
         
         # add buttons
+        # TODO add section to "change font"
+        # TODO add buttons to increase / decrease font size
         # button: move items from input list to output list
         self.createButton(self.btn_frame, relx=0.5, rely=0.05, text="Move Right", command=self.move_items_dir)
         # button: move items from output list back to input list
@@ -80,8 +86,7 @@ class Window(tk.Tk):
         """Function to create a tkinter Listbox."""
         
         # define listbox with multiple selection and scrollbars h/v
-        lb_font = font.Font(family="Courier", size=12)  # default font, mono spaced
-        listbox = tk.Listbox(frame, selectmode=tk.EXTENDED, font=lb_font, listvariable=listvar)
+        listbox = tk.Listbox(frame, selectmode=tk.EXTENDED, font=self.font, listvariable=listvar)
         scrollbarH = tk.Scrollbar(listbox, orient="horizontal")
         scrollbarV = tk.Scrollbar(listbox, orient="vertical")
         
@@ -103,6 +108,8 @@ class Window(tk.Tk):
         
         btn = tk.Button(frame, text=text, command=command)
         btn.place(relx=relx, rely=rely, anchor="center")
+
+    # TODO add function to change the font size used in listboxes
 
     def move_items(self, selection, left_lst, right_lst, sort_right_lst=False):
         """Move selected items (as given by selection) from left list to right list.
