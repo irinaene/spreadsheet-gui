@@ -7,7 +7,7 @@ from datetime import datetime
 # import tkinter depends on py version
 if sys.version_info.major > 2:
     import tkinter as tk
-    from tkinter import messagebox, ttk
+    from tkinter import font, messagebox, ttk
 else:
     import Tkinter as tk
     from TKinter import messagebox, ttk
@@ -80,7 +80,8 @@ class Window(tk.Tk):
         """Function to create a tkinter Listbox."""
         
         # define listbox with multiple selection and scrollbars h/v
-        listbox = tk.Listbox(frame, selectmode=tk.EXTENDED, font="TkFixedFont", listvariable=listvar)
+        lb_font = font.Font(family="Courier", size=12)  # default font, mono spaced
+        listbox = tk.Listbox(frame, selectmode=tk.EXTENDED, font=lb_font, listvariable=listvar)
         scrollbarH = tk.Scrollbar(listbox, orient="horizontal")
         scrollbarV = tk.Scrollbar(listbox, orient="vertical")
         
