@@ -19,6 +19,7 @@ class Window(tk.Tk):
         
         # save input/output file properties
         self.f_out = "out.csv"
+        self.output_dir = os.path.dirname(__file__)
         
         # set window properties
         width, height = 1700, 800
@@ -244,7 +245,7 @@ class Window(tk.Tk):
     def export_with_confirmation(self):
         """Export items to csv using a confirmation box for overwriting."""
         
-        f_out = self.f_out
+        f_out = os.path.join(self.output_dir, self.f_out)
         # check if file exists
         if os.path.exists(f_out):
             title = "Confirmation"
@@ -255,7 +256,7 @@ class Window(tk.Tk):
         if not os.path.exists(f_out) or response:
             self.export_all(f_out)
     
-    def importData(self, list_in, format_dict):
+    def importData(self, list_in, format_dict, output_dir=None):
         """Function to import data contained in list_in into the input listbox."""
         
         # update the relevant data list
@@ -265,3 +266,6 @@ class Window(tk.Tk):
         # update the max lengths for display of fields
         self.desc_len = format_dict['desc_len']
         self.cat_len = format_dict['cat_len']
+        # update the path where to save the output file
+        if output_dir is not None:
+            self.output_dir = output_dir
