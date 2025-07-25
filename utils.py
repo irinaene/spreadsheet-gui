@@ -5,7 +5,7 @@ import glob
 from datetime import datetime
 
 
-def readInputData(input_dir, desc_len=50, cat_len=20):
+def readInputData(input_dir, desc_len=50, cat_len=20, output_file="exported_items.csv"):
     """Function to read data from files living inside input_dir.
     Data is later used to populate the input listbox of GUI."""
     
@@ -19,6 +19,8 @@ def readInputData(input_dir, desc_len=50, cat_len=20):
     files.extend(glob.glob(f"{input_dir}/*.CSV"))
     # on windows, glob + wildcard returns duplicates, fix by using set to select unique values
     files = list(set(files))
+    # exclude the ouput file, if it exists
+    files = [file for file in files if output_file not in file]
     # always open files in same order
     files = sorted(files)
     # add header with column descriptions, nicely formatted
