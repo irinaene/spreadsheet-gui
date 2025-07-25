@@ -29,7 +29,7 @@ if __name__ == "__main__":
     data_lst, format_dict = readInputData(input_dir=input_dir)
     
     # add data to the GUI
-    window.importData(data_lst, format_dict=format_dict)
+    window.importData(data_lst, format_dict=format_dict, output_dir=input_dir)
     
     # run the main tkinter loop
     window.mainloop()
