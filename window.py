@@ -18,7 +18,7 @@ class Window(tk.Tk):
         super().__init__()
         
         # save input/output file properties
-        self.f_out = "out.csv"
+        self.f_out = "exported_items.csv"
         self.output_dir = os.path.dirname(__file__)
         
         # set window properties
