@@ -26,10 +26,10 @@ if __name__ == "__main__":
         input_dir = sys.argv[1]
     
     # read input data and format appropriately
-    data_lst, format_dict = readInputData(input_dir=input_dir)
+    data_lst, format_dict = readInputData(input_dir=input_dir, output_file=window.f_out)
     
     # add data to the GUI
-    window.importData(data_lst, format_dict=format_dict)
+    window.importData(data_lst, format_dict=format_dict, output_dir=input_dir)
     
     # run the main tkinter loop
     window.mainloop()

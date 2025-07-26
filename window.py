@@ -17,6 +17,10 @@ class Window(tk.Tk):
     def __init__(self):
         super().__init__()
         
+        # save input/output file properties
+        self.f_out = "exported_items.csv"
+        self.output_dir = os.path.dirname(__file__)
+        
         # set window properties
         width, height = 1700, 800
         screen_width = self.winfo_screenwidth()
@@ -86,7 +90,8 @@ class Window(tk.Tk):
         sep2 = ttk.Separator(self.btn_frame, orient="horizontal")
         sep2.place(relx=0, rely=0.8, relwidth=1.)
         # label: name of output file
-        self.out_label = tk.Label(self.btn_frame, text='Export to: out.csv', wraplength=160)
+        label_txt = f"Export to: {self.f_out}"
+        self.out_label = tk.Label(self.btn_frame, text=label_txt, wraplength=160)
         self.out_label.place(relx=0.5, rely=0.85, anchor="center")
         # button: export output list to csv
         self.createButton(self.btn_frame, 0.5, 0.9, text="Export", command=self.export_with_confirmation)
@@ -240,7 +245,7 @@ class Window(tk.Tk):
     def export_with_confirmation(self):
         """Export items to csv using a confirmation box for overwriting."""
         
-        f_out = self.out_label["text"].split(":")[1].strip()
+        f_out = os.path.join(self.output_dir, self.f_out)
         # check if file exists
         if os.path.exists(f_out):
             title = "Confirmation"
@@ -251,7 +256,7 @@ class Window(tk.Tk):
         if not os.path.exists(f_out) or response:
             self.export_all(f_out)
     
-    def importData(self, list_in, format_dict):
+    def importData(self, list_in, format_dict, output_dir=None):
         """Function to import data contained in list_in into the input listbox."""
         
         # update the relevant data list
@@ -261,3 +266,6 @@ class Window(tk.Tk):
         # update the max lengths for display of fields
         self.desc_len = format_dict['desc_len']
         self.cat_len = format_dict['cat_len']
+        # update the path where to save the output file
+        if output_dir is not None:
+            self.output_dir = output_dir
