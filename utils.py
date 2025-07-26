@@ -30,7 +30,8 @@ def readInputData(input_dir, desc_len=50, cat_len=20, output_file="exported_item
     header_line = f"{c1} | {c2} | {c3} | Amount"
     list_in.append(header_line)
     # define separator line between different files
-    sep_line = "-" * date_len + "-|-" + "-" * desc_len + "-|-" + "-" * cat_len + "-|-" + "-" * amt_len
+    sep_items = ["-" * date_len, "-" * desc_len, "-" * cat_len, "-" * amt_len]
+    sep_line = "-|-".join(sep_items)
     list_in.append(sep_line)
     for input_file in files:
         # import data using csv module
