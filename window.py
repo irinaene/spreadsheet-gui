@@ -21,14 +21,12 @@ class Window(tk.Tk):
         self.f_out = "exported_items.csv"
         self.output_dir = os.path.dirname(__file__)
         
-        # set window properties
-        width, height = 1700, 800
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        x = (screen_width - width) // 2
-        y = (screen_height - height) // 2
-        self.geometry(f"{width}x{height}+{x}+{y}")
-        self.title('Spreadsheet GUI')
+        # window title
+        self.win_title = "Spreadsheet GUI"
+        
+        # geometry properties
+        self.win_width = 1700
+        self.win_height = 800
         
         # set some default max display lengths for list items
         self.desc_len = 30
@@ -37,6 +35,28 @@ class Window(tk.Tk):
         # default font (monospace)
         self.font_size = 12
         self.font = font.Font(family="Courier", size=self.font_size)
+        
+        # frames to hold the widgets
+        self.in_frame = None  # listbox with imported data
+        self.btn_frame = None  # buttons
+        self.out_frame = None  # listbox with data to be exported
+        
+        # lists and listboxes for input/output data
+        self.list_in = []
+        self.listvar_in = None
+        self.listbox_in = None
+        self.list_out = []
+        self.listvar_out = None
+        self.listbox_out = None
+
+    def create_gui(self):
+        """pass"""
+        
+        # set window title
+        self.title(self.win_title)
+        
+        # set window geometry
+        self.update_geometry(self.win_width, self.win_height)
         
         # create frames to hold the widgets
         self.in_frame = ttk.Frame(self)
@@ -47,29 +67,28 @@ class Window(tk.Tk):
         self.out_frame.place(relx=0.57, rely=0.01, relwidth=0.42, relheight=0.98)
         
         # create input and output lists
-        self.list_in = []
         self.listvar_in = tk.StringVar(value=self.list_in)
         self.listbox_in = self.createListbox(self.in_frame, listvar=self.listvar_in)
-        self.list_out = []
         self.listvar_out = tk.StringVar(value=self.list_out)
         self.listbox_out = self.createListbox(self.out_frame, listvar=self.listvar_out)
         
-        # add buttons
+        # add buttons to interact with data
+        btn_relx = 0.5
         font_label = tk.Label(self.btn_frame, text="Change font size:")
-        font_label.place(relx=0.5, rely=0.05, anchor="center")
+        font_label.place(relx=btn_relx, rely=0.05, anchor="center")
         # button: increase / decrease font size in listbox
         dx = 0.15
-        self.createButton(self.btn_frame, relx=0.5 - dx, rely=0.1, text="-",
-                          command=lambda: self.change_font_size(kind="decrease"))
-        self.createButton(self.btn_frame, relx=0.5 + dx, rely=0.1, text="+",
-                          command=self.change_font_size)
+        for dir_, text, kind in zip([-1, 1], ["-", "+"], ["decrease", "increase"]):
+            # lambda in for loop: https://stackoverflow.com/questions/10865116/tkinter-creating-buttons-in-for-loop-passing-command-arguments
+            self.createButton(self.btn_frame, relx=btn_relx + dx * dir_, rely=0.1, text=text,
+                              command=lambda kind=kind: self.change_font_size(kind=kind))
         # separator
         sep0 = ttk.Separator(self.btn_frame, orient="horizontal")
         sep0.place(relx=0, rely=0.15, relwidth=1.)
         # button: move items from input list to output list
-        self.createButton(self.btn_frame, relx=0.5, rely=0.2, text="Move Right", command=self.move_items_dir)
+        self.createButton(self.btn_frame, relx=btn_relx, rely=0.2, text="Move Right", command=self.move_items_dir)
         # button: move items from output list back to input list
-        self.createButton(self.btn_frame, relx=0.5, rely=0.3, text="Move Left", command=lambda: self.move_items_dir(direction="out_to_in"))
+        self.createButton(self.btn_frame, relx=btn_relx, rely=0.3, text="Move Left", command=lambda: self.move_items_dir(direction="out_to_in"))
         # # button: clear selection from input list
         # self.createButton(self.btn_frame, 0.5, 0.25, text="Clear selection", command=self.clear_selection)
         # separator
@@ -77,24 +96,33 @@ class Window(tk.Tk):
         sep1.place(relx=0, rely=0.35, relwidth=1.)
         # label: change category
         self.cat_label = tk.Label(self.btn_frame, text="Change category to:")
-        self.cat_label.place(relx=0.5, rely=0.4, anchor="center")
+        self.cat_label.place(relx=btn_relx, rely=0.4, anchor="center")
         # button: change category to apartment
-        self.createButton(self.btn_frame, 0.5, 0.45, text="Apartment", command=lambda: self.change_category("Apartment"))
+        self.createButton(self.btn_frame, btn_relx, 0.45, text="Apartment", command=lambda: self.change_category("Apartment"))
         # button: change category to food
-        self.createButton(self.btn_frame, 0.5, 0.55, text="Food", command=lambda: self.change_category("Food"))
+        self.createButton(self.btn_frame, btn_relx, 0.55, text="Food", command=lambda: self.change_category("Food"))
         # button: change category to rent
-        self.createButton(self.btn_frame, 0.5, 0.65, text="Rent", command=lambda: self.change_category("Rent"))
+        self.createButton(self.btn_frame, btn_relx, 0.65, text="Rent", command=lambda: self.change_category("Rent"))
         # button: change category to monthly gift
-        self.createButton(self.btn_frame, 0.5, 0.75, text="Monthly Gift", command=lambda: self.change_category("Monthly Gift"))
+        self.createButton(self.btn_frame, btn_relx, 0.75, text="Monthly Gift", command=lambda: self.change_category("Monthly Gift"))
         # separator
         sep2 = ttk.Separator(self.btn_frame, orient="horizontal")
         sep2.place(relx=0, rely=0.8, relwidth=1.)
         # label: name of output file
         label_txt = f"Export to: {self.f_out}"
         self.out_label = tk.Label(self.btn_frame, text=label_txt, wraplength=160)
-        self.out_label.place(relx=0.5, rely=0.85, anchor="center")
+        self.out_label.place(relx=btn_relx, rely=0.85, anchor="center")
         # button: export output list to csv
-        self.createButton(self.btn_frame, 0.5, 0.9, text="Export", command=self.export_with_confirmation)
+        self.createButton(self.btn_frame, btn_relx, 0.9, text="Export", command=self.export_with_confirmation)
+
+    def update_geometry(self, width=800, height=600):
+        """Function to update width and height for main GUI window."""
+        
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+        self.geometry(f"{width}x{height}+{x}+{y}")
 
     def createListbox(self, frame, listvar=None):
         """Function to create a tkinter Listbox."""
