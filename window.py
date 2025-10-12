@@ -28,6 +28,9 @@ class Window(tk.Tk):
         self.win_width = 1700
         self.win_height = 800
         
+        # transaction categories
+        self.categories = ["Apartment", "Food", "Rent", "Monthly Gift"]
+        
         # set some default max display lengths for list items
         self.desc_len = 30
         self.cat_len = 10
@@ -82,6 +85,7 @@ class Window(tk.Tk):
             # lambda in for loop: https://stackoverflow.com/questions/10865116/tkinter-creating-buttons-in-for-loop-passing-command-arguments
             self.createButton(self.btn_frame, relx=btn_relx + dx * dir_, rely=0.1, text=text,
                               command=lambda kind=kind: self.change_font_size(kind=kind))
+        
         # separator
         sep0 = ttk.Separator(self.btn_frame, orient="horizontal")
         sep0.place(relx=0, rely=0.15, relwidth=1.)
@@ -89,22 +93,18 @@ class Window(tk.Tk):
         self.createButton(self.btn_frame, relx=btn_relx, rely=0.2, text="Move Right", command=self.move_items_dir)
         # button: move items from output list back to input list
         self.createButton(self.btn_frame, relx=btn_relx, rely=0.3, text="Move Left", command=lambda: self.move_items_dir(direction="out_to_in"))
-        # # button: clear selection from input list
-        # self.createButton(self.btn_frame, 0.5, 0.25, text="Clear selection", command=self.clear_selection)
+        
         # separator
         sep1 = ttk.Separator(self.btn_frame, orient="horizontal")
         sep1.place(relx=0, rely=0.35, relwidth=1.)
         # label: change category
         self.cat_label = tk.Label(self.btn_frame, text="Change category to:")
         self.cat_label.place(relx=btn_relx, rely=0.4, anchor="center")
-        # button: change category to apartment
-        self.createButton(self.btn_frame, btn_relx, 0.45, text="Apartment", command=lambda: self.change_category("Apartment"))
-        # button: change category to food
-        self.createButton(self.btn_frame, btn_relx, 0.55, text="Food", command=lambda: self.change_category("Food"))
-        # button: change category to rent
-        self.createButton(self.btn_frame, btn_relx, 0.65, text="Rent", command=lambda: self.change_category("Rent"))
-        # button: change category to monthly gift
-        self.createButton(self.btn_frame, btn_relx, 0.75, text="Monthly Gift", command=lambda: self.change_category("Monthly Gift"))
+        # button: change category to apartment, food, rent, monthly gift
+        for i, cat in enumerate(self.categories):
+            self.createButton(self.btn_frame, btn_relx, 0.45 + i * 0.1, text=cat,
+                              command=lambda cat=cat: self.change_category(cat))
+        
         # separator
         sep2 = ttk.Separator(self.btn_frame, orient="horizontal")
         sep2.place(relx=0, rely=0.8, relwidth=1.)
