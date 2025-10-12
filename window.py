@@ -71,9 +71,9 @@ class Window(tk.Tk):
         
         # create input and output lists
         self.listvar_in = tk.StringVar(value=self.list_in)
-        self.listbox_in = self.createListbox(self.in_frame, listvar=self.listvar_in)
+        self.listbox_in = self.create_listbox(self.in_frame, listvar=self.listvar_in)
         self.listvar_out = tk.StringVar(value=self.list_out)
-        self.listbox_out = self.createListbox(self.out_frame, listvar=self.listvar_out)
+        self.listbox_out = self.create_listbox(self.out_frame, listvar=self.listvar_out)
         
         # add buttons to interact with data
         btn_relx = 0.5
@@ -83,16 +83,16 @@ class Window(tk.Tk):
         dx = 0.15
         for dir_, text, kind in zip([-1, 1], ["-", "+"], ["decrease", "increase"]):
             # lambda in for loop: https://stackoverflow.com/questions/10865116/tkinter-creating-buttons-in-for-loop-passing-command-arguments
-            self.createButton(self.btn_frame, relx=btn_relx + dx * dir_, rely=0.1, text=text,
+            self.create_button(self.btn_frame, relx=btn_relx + dx * dir_, rely=0.1, text=text,
                               command=lambda kind=kind: self.change_font_size(kind=kind))
         
         # separator
         sep0 = ttk.Separator(self.btn_frame, orient="horizontal")
         sep0.place(relx=0, rely=0.15, relwidth=1.)
         # button: move items from input list to output list
-        self.createButton(self.btn_frame, relx=btn_relx, rely=0.2, text="Move Right", command=self.move_items_dir)
+        self.create_button(self.btn_frame, relx=btn_relx, rely=0.2, text="Move Right", command=self.move_items_dir)
         # button: move items from output list back to input list
-        self.createButton(self.btn_frame, relx=btn_relx, rely=0.3, text="Move Left", command=lambda: self.move_items_dir(direction="out_to_in"))
+        self.create_button(self.btn_frame, relx=btn_relx, rely=0.3, text="Move Left", command=lambda: self.move_items_dir(direction="out_to_in"))
         
         # separator
         sep1 = ttk.Separator(self.btn_frame, orient="horizontal")
@@ -102,7 +102,7 @@ class Window(tk.Tk):
         self.cat_label.place(relx=btn_relx, rely=0.4, anchor="center")
         # button: change category to apartment, food, rent, monthly gift
         for i, cat in enumerate(self.categories):
-            self.createButton(self.btn_frame, btn_relx, 0.45 + i * 0.1, text=cat,
+            self.create_button(self.btn_frame, btn_relx, 0.45 + i * 0.1, text=cat,
                               command=lambda cat=cat: self.change_category(cat))
         
         # separator
@@ -113,7 +113,7 @@ class Window(tk.Tk):
         self.out_label = tk.Label(self.btn_frame, text=label_txt, wraplength=160)
         self.out_label.place(relx=btn_relx, rely=0.85, anchor="center")
         # button: export output list to csv
-        self.createButton(self.btn_frame, btn_relx, 0.9, text="Export", command=self.export_with_confirmation)
+        self.create_button(self.btn_frame, btn_relx, 0.9, text="Export", command=self.export_with_confirmation)
 
     def update_geometry(self, width=800, height=600):
         """Function to update width and height for main GUI window."""
@@ -124,7 +124,7 @@ class Window(tk.Tk):
         y = (screen_height - height) // 2
         self.geometry(f"{width}x{height}+{x}+{y}")
 
-    def createListbox(self, frame, listvar=None):
+    def create_listbox(self, frame, listvar=None):
         """Function to create a tkinter Listbox."""
         
         # define listbox with multiple selection and scrollbars h/v
@@ -145,7 +145,7 @@ class Window(tk.Tk):
         
         return listbox
     
-    def createButton(self, frame, relx, rely, text, command):
+    def create_button(self, frame, relx, rely, text, command):
         """Function to add button for a particular command."""
         
         btn = tk.Button(frame, text=text, command=command)
