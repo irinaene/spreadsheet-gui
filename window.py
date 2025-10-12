@@ -53,7 +53,7 @@ class Window(tk.Tk):
         self.listbox_out = None
 
     def create_gui(self):
-        """pass"""
+        """Main method to populate the GUI window with widgets."""
         
         # set window title
         self.title(self.win_title)
