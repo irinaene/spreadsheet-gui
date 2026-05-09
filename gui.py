@@ -10,6 +10,8 @@ from window import Window
 if __name__ == "__main__":
     # create the GUI object
     window = Window()
+    # create the widgets
+    window.create_gui()
     # open window on top
     window.focus_force()
     # run mainloop once to update position of window (otherwise filedialog will mess up the geom)
