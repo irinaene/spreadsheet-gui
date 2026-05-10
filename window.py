@@ -53,8 +53,8 @@ class Window(tk.Tk):
         self.listvar_out = None
         self.listbox_out = None
         
-        # variable for user radio buttons
-        self.radio_val = tk.IntVar()
+        # variable for export format
+        self.export_fmt = tk.IntVar()
 
     def create_gui(self):
         """Main method to populate the GUI window with widgets."""
@@ -82,9 +82,9 @@ class Window(tk.Tk):
         self.listbox_out = self.create_listbox(self.out_frame, listvar=self.listvar_out)
         
         # add radio button to select which format to use for export
-        self.radio_val.set(1)
-        self.create_radio_button(self.radio_frame, relx=0.25, rely=0.5, text="Export 1", var=self.radio_val, value=1)
-        self.create_radio_button(self.radio_frame, relx=0.75, rely=0.5, text="Export 2", var=self.radio_val, value=2)
+        self.export_fmt.set(1)
+        self.create_radio_button(self.radio_frame, relx=0.25, rely=0.5, text="Export 1", var=self.export_fmt, value=1)
+        self.create_radio_button(self.radio_frame, relx=0.75, rely=0.5, text="Export 2", var=self.export_fmt, value=2)
         
         # add buttons to interact with data
         btn_relx = 0.5
@@ -261,10 +261,8 @@ class Window(tk.Tk):
         
         # map between order of fields in listbox and in output file
         field_map = {0: 1, 1: 0, 2: 2, 4: 3}
-        # get the value for the export format
-        export_fmt = self.radio_val.get()
-        # index where to duplicate the amount value
-        amount_idx = 6 if export_fmt == 1 else 5
+        # index where to duplicate the amount value based on chosen export format
+        amount_idx = 6 if self.export_fmt.get() == 1 else 5
         field_map[amount_idx] = 3
         num_new_fields = len(field_map) + 2
         
