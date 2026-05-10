@@ -41,6 +41,7 @@ class Window(tk.Tk):
         
         # frames to hold the widgets
         self.in_frame = None  # listbox with imported data
+        self.radio_frame = None  # radio buttons
         self.btn_frame = None  # buttons
         self.out_frame = None  # listbox with data to be exported
         
@@ -51,6 +52,9 @@ class Window(tk.Tk):
         self.list_out = []
         self.listvar_out = None
         self.listbox_out = None
+        
+        # variable for user radio buttons
+        self.radio_val = tk.IntVar()
 
     def create_gui(self):
         """Main method to populate the GUI window with widgets."""
@@ -63,9 +67,11 @@ class Window(tk.Tk):
         
         # create frames to hold the widgets
         self.in_frame = ttk.Frame(self)
+        self.radio_frame = ttk.Frame(self)
         self.btn_frame = ttk.Frame(self)
         self.out_frame = ttk.Frame(self)
         self.in_frame.place(relx=0.01, rely=0.01, relwidth=0.42, relheight=0.98)
+        self.radio_frame.place(relx=0.45, rely=0.85, relwidth=0.1, relheight=0.1)
         self.btn_frame.place(relx=0.45, rely=0.125, relwidth=0.1, relheight=0.75)
         self.out_frame.place(relx=0.57, rely=0.01, relwidth=0.42, relheight=0.98)
         
@@ -74,6 +80,11 @@ class Window(tk.Tk):
         self.listbox_in = self.create_listbox(self.in_frame, listvar=self.listvar_in)
         self.listvar_out = tk.StringVar(value=self.list_out)
         self.listbox_out = self.create_listbox(self.out_frame, listvar=self.listvar_out)
+        
+        # add radio button to select which format to use for export
+        self.radio_val.set(1)
+        self.create_radio_button(self.radio_frame, relx=0.25, rely=0.5, text="Export 1", var=self.radio_val, value=1)
+        self.create_radio_button(self.radio_frame, relx=0.75, rely=0.5, text="Export 2", var=self.radio_val, value=2)
         
         # add buttons to interact with data
         btn_relx = 0.5
@@ -150,6 +161,12 @@ class Window(tk.Tk):
         
         btn = tk.Button(frame, text=text, command=command)
         btn.place(relx=relx, rely=rely, anchor="center")
+
+    def create_radio_button(self, frame, relx, rely, text, var, value) -> None:
+        """Function to create a radio button."""
+        
+        radio_btn = tk.Radiobutton(frame, text=text, variable=var, value=value)
+        radio_btn.place(relx=relx, rely=rely, anchor="center")
 
     def change_font_size(self, kind="increase"):
         incr = 1 if kind == "increase" else -1
@@ -243,7 +260,13 @@ class Window(tk.Tk):
         """Export items from output list to csv file f_out."""
         
         # map between order of fields in listbox and in output file
-        field_map = {0: 1, 1: 0, 2: 2, 4: 3, 6: 3}
+        field_map = {0: 1, 1: 0, 2: 2, 4: 3}
+        # get the value for the export format
+        export_fmt = self.radio_val.get()
+        # index where to duplicate the amount value
+        amount_idx = 6 if export_fmt == 1 else 5
+        field_map[amount_idx] = 3
+        num_new_fields = len(field_map) + 2
         
         all_items = self.listbox_out.get(0, tk.END)[:-1]  # last item is empty line
         with open(f_out, "w") as f:
@@ -251,9 +274,9 @@ class Window(tk.Tk):
                 fields = item.split(" | ")
                 fields = [field.strip() for field in fields]
                 # construct list with new fields to write in output file
-                new_fields = [""] * 7
-                for k in field_map:
-                    new_fields[k] = fields[field_map[k]]
+                new_fields = [""] * num_new_fields
+                for k, v in field_map.items():
+                    new_fields[k] = fields[v]
                 ## postprocessing
                 # add default value for purchase method
                 new_fields[3] = "cc"
@@ -261,11 +284,11 @@ class Window(tk.Tk):
                 date = datetime.strptime(new_fields[1], "%Y-%m-%d").strftime("%m/%d/%Y")
                 new_fields[1] = date
                 # fix sign for amount fields
-                for i in [4, 6]:
+                for i in [4, amount_idx]:
                     new_fields[i] = f"{-1 * float(new_fields[i]):.2f}"
                 # special case: monthly gift
                 if new_fields[2] == "Monthly Gift":
-                    new_fields[6] = ""
+                    new_fields[amount_idx] = ""
                 new_entry = ",".join(new_fields)
                 f.write(new_entry + "\n")
         # print(f"Exported data to file: {f_out}")
