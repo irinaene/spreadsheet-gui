@@ -41,6 +41,7 @@ class Window(tk.Tk):
         
         # frames to hold the widgets
         self.in_frame = None  # listbox with imported data
+        self.radio_frame = None  # radio buttons
         self.btn_frame = None  # buttons
         self.out_frame = None  # listbox with data to be exported
         
@@ -51,6 +52,9 @@ class Window(tk.Tk):
         self.list_out = []
         self.listvar_out = None
         self.listbox_out = None
+        
+        # variable for export format
+        self.export_fmt = tk.IntVar()
 
     def create_gui(self):
         """Main method to populate the GUI window with widgets."""
@@ -59,21 +63,28 @@ class Window(tk.Tk):
         self.title(self.win_title)
         
         # set window geometry
-        self.update_geometry(self.win_width, self.win_height)
+        self._update_geometry(self.win_width, self.win_height)
         
         # create frames to hold the widgets
         self.in_frame = ttk.Frame(self)
+        self.radio_frame = ttk.Frame(self)
         self.btn_frame = ttk.Frame(self)
         self.out_frame = ttk.Frame(self)
         self.in_frame.place(relx=0.01, rely=0.01, relwidth=0.42, relheight=0.98)
+        self.radio_frame.place(relx=0.45, rely=0.85, relwidth=0.1, relheight=0.1)
         self.btn_frame.place(relx=0.45, rely=0.125, relwidth=0.1, relheight=0.75)
         self.out_frame.place(relx=0.57, rely=0.01, relwidth=0.42, relheight=0.98)
         
         # create input and output lists
         self.listvar_in = tk.StringVar(value=self.list_in)
-        self.listbox_in = self.create_listbox(self.in_frame, listvar=self.listvar_in)
+        self.listbox_in = self._create_listbox(self.in_frame, listvar=self.listvar_in)
         self.listvar_out = tk.StringVar(value=self.list_out)
-        self.listbox_out = self.create_listbox(self.out_frame, listvar=self.listvar_out)
+        self.listbox_out = self._create_listbox(self.out_frame, listvar=self.listvar_out)
+        
+        # add radio button to select which format to use for export
+        self.export_fmt.set(1)
+        self._create_radio_button(self.radio_frame, relx=0.25, rely=0.5, text="Export 1", var=self.export_fmt, value=1)
+        self._create_radio_button(self.radio_frame, relx=0.75, rely=0.5, text="Export 2", var=self.export_fmt, value=2)
         
         # add buttons to interact with data
         btn_relx = 0.5
@@ -83,16 +94,16 @@ class Window(tk.Tk):
         dx = 0.15
         for dir_, text, kind in zip([-1, 1], ["-", "+"], ["decrease", "increase"]):
             # lambda in for loop: https://stackoverflow.com/questions/10865116/tkinter-creating-buttons-in-for-loop-passing-command-arguments
-            self.create_button(self.btn_frame, relx=btn_relx + dx * dir_, rely=0.1, text=text,
-                              command=lambda kind=kind: self.change_font_size(kind=kind))
+            self._create_button(self.btn_frame, relx=btn_relx + dx * dir_, rely=0.1, text=text,
+                              command=lambda kind=kind: self._change_font_size(kind=kind))
         
         # separator
         sep0 = ttk.Separator(self.btn_frame, orient="horizontal")
         sep0.place(relx=0, rely=0.15, relwidth=1.)
         # button: move items from input list to output list
-        self.create_button(self.btn_frame, relx=btn_relx, rely=0.2, text="Move Right", command=self.move_items_dir)
+        self._create_button(self.btn_frame, relx=btn_relx, rely=0.2, text="Move Right", command=self._move_items_dir)
         # button: move items from output list back to input list
-        self.create_button(self.btn_frame, relx=btn_relx, rely=0.3, text="Move Left", command=lambda: self.move_items_dir(direction="out_to_in"))
+        self._create_button(self.btn_frame, relx=btn_relx, rely=0.3, text="Move Left", command=lambda: self._move_items_dir(direction="out_to_in"))
         
         # separator
         sep1 = ttk.Separator(self.btn_frame, orient="horizontal")
@@ -102,8 +113,8 @@ class Window(tk.Tk):
         self.cat_label.place(relx=btn_relx, rely=0.4, anchor="center")
         # button: change category to apartment, food, rent, monthly gift
         for i, cat in enumerate(self.categories):
-            self.create_button(self.btn_frame, btn_relx, 0.45 + i * 0.1, text=cat,
-                              command=lambda cat=cat: self.change_category(cat))
+            self._create_button(self.btn_frame, btn_relx, 0.45 + i * 0.1, text=cat,
+                              command=lambda cat=cat: self._change_category(cat))
         
         # separator
         sep2 = ttk.Separator(self.btn_frame, orient="horizontal")
@@ -113,9 +124,9 @@ class Window(tk.Tk):
         self.out_label = tk.Label(self.btn_frame, text=label_txt, wraplength=160)
         self.out_label.place(relx=btn_relx, rely=0.85, anchor="center")
         # button: export output list to csv
-        self.create_button(self.btn_frame, btn_relx, 0.9, text="Export", command=self.export_with_confirmation)
+        self._create_button(self.btn_frame, btn_relx, 0.9, text="Export", command=self._export_with_confirmation)
 
-    def update_geometry(self, width=800, height=600):
+    def _update_geometry(self, width=800, height=600):
         """Function to update width and height for main GUI window."""
         
         screen_width = self.winfo_screenwidth()
@@ -124,7 +135,7 @@ class Window(tk.Tk):
         y = (screen_height - height) // 2
         self.geometry(f"{width}x{height}+{x}+{y}")
 
-    def create_listbox(self, frame, listvar=None):
+    def _create_listbox(self, frame, listvar=None):
         """Function to create a tkinter Listbox."""
         
         # define listbox with multiple selection and scrollbars h/v
@@ -145,13 +156,19 @@ class Window(tk.Tk):
         
         return listbox
     
-    def create_button(self, frame, relx, rely, text, command):
+    def _create_button(self, frame, relx, rely, text, command):
         """Function to add button for a particular command."""
         
         btn = tk.Button(frame, text=text, command=command)
         btn.place(relx=relx, rely=rely, anchor="center")
 
-    def change_font_size(self, kind="increase"):
+    def _create_radio_button(self, frame, relx, rely, text, var, value) -> None:
+        """Function to create a radio button."""
+        
+        radio_btn = tk.Radiobutton(frame, text=text, variable=var, value=value)
+        radio_btn.place(relx=relx, rely=rely, anchor="center")
+
+    def _change_font_size(self, kind="increase"):
         incr = 1 if kind == "increase" else -1
         self.font_size = self.font_size + incr
         # avoid negative or too large font size
@@ -159,7 +176,7 @@ class Window(tk.Tk):
             self.font_size = 12
         self.font.config(size=self.font_size)
 
-    def move_items(self, selection, left_lst, right_lst, sort_right_lst=False):
+    def _move_items(self, selection, left_lst, right_lst, sort_right_lst=False):
         """Move selected items (as given by selection) from left list to right list.
         Optionally sorts the right list."""
         
@@ -184,7 +201,7 @@ class Window(tk.Tk):
         for item in allowed_sel[::-1]:
             left_lst.pop(item)
     
-    def move_items_dir(self, direction="in_to_out"):
+    def _move_items_dir(self, direction="in_to_out"):
         """Moves items from input listbox to output listbox or vice versa."""
         
         # define the two allowed directions
@@ -203,11 +220,11 @@ class Window(tk.Tk):
             right_lvar = self.listvar_in
             sort_right_lst = False
         else:
-            print("Unsupported direction provided to move_items_dir, please double check!")
+            print("Unsupported direction provided to _move_items_dir, please double check!")
             return
         
         # move the selected items
-        self.move_items(left_lb.curselection(), left_lst, right_lst, sort_right_lst=sort_right_lst)
+        self._move_items(left_lb.curselection(), left_lst, right_lst, sort_right_lst=sort_right_lst)
         
         # post-processing: update the StringVars to propagate changes to ListBoxes
         left_lvar.set(left_lst)
@@ -216,12 +233,12 @@ class Window(tk.Tk):
         # clear the current selection to start fresh for the next move
         left_lb.select_clear(0, tk.END)
         
-    def clear_selection(self):
+    def _clear_selection(self):
         """Clears the current selection of the input listbox."""
         
         self.listbox_in.selection_clear(0, tk.END)
             
-    def change_category(self, category):
+    def _change_category(self, category):
         """Change selected item category to provided category.
         Applies only to items in the output list."""
         
@@ -239,11 +256,15 @@ class Window(tk.Tk):
         # update the StringVar
         self.listvar_out.set(self.list_out)
             
-    def export_all(self, f_out):
+    def _export_all(self, f_out):
         """Export items from output list to csv file f_out."""
         
         # map between order of fields in listbox and in output file
-        field_map = {0: 1, 1: 0, 2: 2, 4: 3, 6: 3}
+        field_map = {0: 1, 1: 0, 2: 2, 4: 3}
+        # index where to duplicate the amount value based on chosen export format
+        amount_idx = 6 if self.export_fmt.get() == 1 else 5
+        field_map[amount_idx] = 3
+        num_new_fields = len(field_map) + 2
         
         all_items = self.listbox_out.get(0, tk.END)[:-1]  # last item is empty line
         with open(f_out, "w") as f:
@@ -251,9 +272,9 @@ class Window(tk.Tk):
                 fields = item.split(" | ")
                 fields = [field.strip() for field in fields]
                 # construct list with new fields to write in output file
-                new_fields = [""] * 7
-                for k in field_map:
-                    new_fields[k] = fields[field_map[k]]
+                new_fields = [""] * num_new_fields
+                for k, v in field_map.items():
+                    new_fields[k] = fields[v]
                 ## postprocessing
                 # add default value for purchase method
                 new_fields[3] = "cc"
@@ -261,16 +282,16 @@ class Window(tk.Tk):
                 date = datetime.strptime(new_fields[1], "%Y-%m-%d").strftime("%m/%d/%Y")
                 new_fields[1] = date
                 # fix sign for amount fields
-                for i in [4, 6]:
+                for i in [4, amount_idx]:
                     new_fields[i] = f"{-1 * float(new_fields[i]):.2f}"
                 # special case: monthly gift
                 if new_fields[2] == "Monthly Gift":
-                    new_fields[6] = ""
+                    new_fields[amount_idx] = ""
                 new_entry = ",".join(new_fields)
                 f.write(new_entry + "\n")
         # print(f"Exported data to file: {f_out}")
     
-    def export_with_confirmation(self):
+    def _export_with_confirmation(self):
         """Export items to csv using a confirmation box for overwriting."""
         
         f_out = os.path.join(self.output_dir, self.f_out)
@@ -282,7 +303,7 @@ class Window(tk.Tk):
             response = messagebox.askyesno(title, msg, parent=self)
         # export if file doesn't exist or response is yes
         if not os.path.exists(f_out) or response:
-            self.export_all(f_out)
+            self._export_all(f_out)
     
     def importData(self, list_in, format_dict, output_dir=None):
         """Function to import data contained in list_in into the input listbox."""
