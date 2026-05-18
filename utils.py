@@ -12,8 +12,10 @@ def readInputData(input_dir, desc_len=50, cat_len=20, output_file="exported_item
     # set of currently fixed formatting parameters
     date_len = 10
     amt_len = 11
+   
     # list to hold all the data rows from relevant files
     list_in = []
+    
     # get files from input_dir
     files = glob.glob(f"{input_dir}/*.csv")
     files.extend(glob.glob(f"{input_dir}/*.CSV"))
@@ -23,25 +25,32 @@ def readInputData(input_dir, desc_len=50, cat_len=20, output_file="exported_item
     files = [file for file in files if output_file not in file]
     # always open files in same order
     files = sorted(files)
+    
     # add header with column descriptions, nicely formatted
     c1 = "Date".ljust(date_len)
     c2 = "Description".ljust(desc_len)
     c3 = "Category".ljust(cat_len)
     header_line = f"{c1} | {c2} | {c3} | Amount"
     list_in.append(header_line)
+    
     # define separator line between different files
     sep_items = ["-" * date_len, "-" * desc_len, "-" * cat_len, "-" * amt_len]
     sep_line = "-|-".join(sep_items)
     list_in.append(sep_line)
+    
     for input_file in files:
-        # import data using csv module
         with open(input_file) as fin:
-            csv_reader = csv.reader(fin, delimiter=',', quotechar='"')
-            header = ",".join(next(csv_reader))
+            # remove comment lines
+            fin_filtered = filter(lambda row: not row.startswith('#'), fin)
+            # import data using csv module
+            csv_reader = csv.reader(fin_filtered, delimiter=',', quotechar='"')
+            # get header line, remove non utf-8 characters
+            header = ",".join(next(csv_reader)).replace("\ufeff", "")
+            
             for row in csv_reader:
                 row_str = " ".join(row).lower()
                 # skip the autopay lines and empty line
-                if ("autopay" in row_str) or ("automatic payment" in row_str) or (len(row) == 0):
+                if ("autopay" in row_str) or ("automatic payment" in row_str) or ("auto payment" in row_str) or (len(row) == 0):
                     continue
                 # format row depending on csv header info
                 new_row = formatRow(row, header=header, desc_len=desc_len, cat_len=cat_len)
@@ -51,6 +60,7 @@ def readInputData(input_dir, desc_len=50, cat_len=20, output_file="exported_item
                 list_in.append(concat_row)
         # add a line to separate between the different data sources
         list_in.append(sep_line)
+    
     # fix last line not showing properly b/c of scrollbar
     list_in.append("")
     # dict containing the params for formatting the various fields
@@ -63,11 +73,11 @@ def formatRow(row, header, desc_len, cat_len):
     
     # use header to decide what info is contained in row
     if header == "Date,Description,Amount":
+        idx = [0, 1, 1, 2]
+        row = [row[id] for id in idx]
         # change the date to yyyy-mm-dd format
         date = datetime.strptime(row[0], "%m/%d/%Y").strftime("%Y-%m-%d")
         row[0] = date
-        # add a default category
-        row.insert(2, "Food")
         # amount: ensure consistent signs, debit -, credit +
         row[3] = f"{-1 * float(row[3]):.2f}"
     elif header == "Transaction Date,Posted Date,Card No.,Description,Category,Debit,Credit":
@@ -81,24 +91,45 @@ def formatRow(row, header, desc_len, cat_len):
         # remove credit info
         row.pop(len(row) - 1)
     elif header == "Details,Posting Date,Description,Amount,Type,Balance,Check or Slip #":
-        idx = [1, 2, 3]
+        idx = [1, 2, 2, 3]
         row = [row[id] for id in idx]
         # change the date to yyyy-mm-dd format
         date = datetime.strptime(row[0], "%m/%d/%Y").strftime("%Y-%m-%d")
         row[0] = date
-        # add a default category
-        row.insert(2, "Food")
     elif header == "Transaction Date,Post Date,Description,Category,Type,Amount,Memo":
         idx = [0, 2, 3, 5]
         row = [row[id] for id in idx]
         # change the date to yyyy-mm-dd format
         date = datetime.strptime(row[0], "%m/%d/%Y").strftime("%Y-%m-%d")
         row[0] = date
+    elif header == "Trans. Date,Post Date,Description,Amount,Category":
+        idx = [0, 2, 4, 3]
+        row = [row[id] for id in idx]
+        # change the date to yyyy-mm-dd format
+        date = datetime.strptime(row[0], "%m/%d/%Y").strftime("%Y-%m-%d")
+        row[0] = date
+        # amount: ensure consistent signs, debit -, credit +
+        row[3] = f"{-1 * float(row[3]):.2f}"
+    elif header == '"Transaction Date",Posting Date,Ref#,Amount,Description,Last 4 of Card/Account,Transaction Type':
+        idx = [0, 4, 6, 3]
+        row = [row[id] for id in idx]
+        # amount: ensure consistent signs, debit -, credit +
+        row[3] = f"{-1 * float(row[3]):.2f}"
+    elif header == "Date,Description,Amount,Running Bal.":
+        idx = [0, 1, 1, 2]
+        row = [row[id] for id in idx]
+        # change the date to yyyy-mm-dd format
+        date = datetime.strptime(row[0], "%m/%d/%Y").strftime("%Y-%m-%d")
+        row[0] = date
+        # fix amount being show with ,
+        row[3] = row[3].replace(",", "")
+    
     # set max length for description
     if len(row[1]) < desc_len:
         row[1] = row[1].ljust(desc_len)
     else:
         row[1] = row[1][:desc_len]
+    
     # set default category for all rows and max length for category
     row[2] = "Food".ljust(cat_len)
     
