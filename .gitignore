@@ -1,0 +1,8 @@
+# pixi environments
+.pixi
+
+# vscode settings
+.vscode
+
+# python related
+__pycache__
